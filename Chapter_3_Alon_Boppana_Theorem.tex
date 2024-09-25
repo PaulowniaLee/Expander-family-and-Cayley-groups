@@ -1,0 +1,367 @@
+\documentclass{book}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{graphicx} % Required for inserting images
+\usepackage{amsmath} % basic math stuff, also aligned environment 
+\usepackage{amsfonts} % defeines blackboard bold fonts for \Z, \R
+\usepackage{tikz} % Drawing environment 
+\usepackage{amsthm} % AMS theorem defining stuff
+
+% Formating stuff
+\usepackage{hyphenat} % forbid use of hyphen
+%complete elimination of hyphen 
+\righthyphenmin = 100
+\lefthyphenmin = 100
+%取消段前空格
+\setlength{\parindent}{0pt}
+
+% Makes section headings and cross references act like links
+\usepackage[colorlinks,unicode]{hyperref}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Create simple shortcut commands.  Almost everyone who uses LaTeX
+% creates commands like thes.
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\C}{\mathbb{C}}
+
+% this is to highlight words that are being defined and enter.
+\newcommand{\define}[1]{\textbf{#1}}
+
+% Symmetric inclusion symbol 
+\newcommand{\syin}{$\subset$\kern-0.48em\raisebox{.20ex}{\tiny S}}
+%\kern 左右移动(-为向左)，\raisebox 上下移动(-为向下)
+
+% diam
+\newcommand{\diam}[1]{\textrm{diam}( #1 )}
+% inner product 
+\newcommand{\inner}[1]{\langle #1 \rangle}
+% norm 
+\newcommand{\norm}[1]{\lVert #1 \rVert}
+% dist
+\newcommand{\dist}[1]{\textrm{dist}( #1 )}
+% absolute value 
+\newcommand{\abs}[1]{\lvert #1 \rvert }
+% Cayley graph 
+\newcommand{\Cay}[1]{\textrm{Cay}( #1 )}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% The next page or two of stuff is devoted to creating and
+% manipulating the environments for lemma, proof, example, etc.
+% The first part is pretty simple, and almost everyone has commands
+% like this in every paper, article, book, etc.  
+% 
+% We start with things like lemmas, theorems, etc.
+
+%注释
+%\newtheorem{env name}{text}[parent counter]
+%\newtheorem{env name}[shared counter]{text}
+%parent counter: numbering will resteart whenever that sectional level is encountered
+%shared counter: if specificed, numbering will progress sequentially for 
+%all theorem element using this counter
+
+\theoremstyle{definition} 
+%adds extra space above and below, but sets the text in roman
+%recommended for definitions, conditions, problems, and examples
+
+\newtheorem{lemma}{Lemma}[chapter]
+\newtheorem{proposition}[lemma]{Proposition}
+\newtheorem{cor}[lemma]{Corollary}
+\newtheorem{definition}[lemma]{Definition}
+
+%自定义新的theorem environment
+\newtheoremstyle{remarkstyle}
+    {\topsep}%   space above, empty for `usual value'
+    {\topsep}%   space below
+    {}%          body font, input \itshape for italian
+    {}%          indent amount 
+    {}%          thm head font 
+    {}%          Punctuation after thm head
+    {\newline}%  Space after thm head: \newline = linebreak
+    {}%          Thm head spec
+\theoremstyle{remarkstyle}
+\newtheorem*{remark}{Remark}%[chapter] 
+\newtheorem*{example}{Example}%[chapter]
+\newtheorem*{myproof}{Proof}%[chapter]
+%this formating (* and %[chapter]) elminates numbering for theorem environment
+
+%theorem之间的空间是手动调的，在最后加个\newline或者item[]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% The stuff that follows is a bit tricky, and is well more than most
+% people do with LaTeX.  The basic idea is that I want to be able to
+% show only examples, or only definitions, or hide only proofs, etc.  
+
+
+\makeatletter
+% the following key values give the set up for hiding certain
+% environemnts. Note that "true" is just a dummy value.  It would work
+% equally well with "foo".  Each one of these redefines the outer
+% environment for an atom to turn the whole thing into a hidden
+% comment.  Note that the environments theorem, example, etc. do not
+% have to be written in any special way for hide and show to work.
+% They get clobbered by hide.  
+  \define@key{hide}{lemma}[true]{\renewenvironment{lemma}{\comment}{\endcomment}}
+  \define@key{hide}{comments}[true]{\renewenvironment{comments}{\comment}{\endcomment}}
+  \define@key{hide}{cor}[true]{\renewenvironment{cor}{\comment}{\endcomment}}
+  \define@key{hide}{definition}[true]{\renewenvironment{definition}{\comment}{\endcomment}}
+  \define@key{hide}{example}[true]{\renewenvironment{example}{\comment}{\endcomment}}
+  \define@key{hide}{proposition}[true]{\renewenvironment{proposition}{\comment}{\endcomment}}
+  \define@key{hide}{remark}[true]{\renewenvironment{remark}{\comment}{\endcomment}}
+    \define@key{hide}{myproof}[true]{\renewenvironment{myproof}{\comment}{\endcomment}}
+% Now this command can be given a comma separated list of names to
+% hide.  Thus, \HideEnvirons{ example, proof} would hide all examples
+% and proofs.
+\newcommand{\HideEnvirons}[1]{\setkeys{hide}{#1}}
+
+
+% The \ShowEnvirons command works like this: if it's argument is foo,
+% it redefines the *hide* family key for foo to do nothing.  Then, it
+% issues a \HideEnvirons command containing a list of all the atom
+% types.  So, everything is hidden *unless* the hide-family key has
+% been redefinied.
+  \define@key{show}{lemma}[true]{\define@key{hide}{lemma}{}}
+  \define@key{show}{comments}[true]{\define@key{hide}{comments}{}}
+  \define@key{show}{cor}[true]{\define@key{hide}{cor}{}}
+  \define@key{show}{definition}[true]{\define@key{hide}{definition}{}}
+  \define@key{show}{example}[true]{\define@key{hide}{example}{}}
+  \define@key{show}{proposition}[true]{\define@key{hide}{proposition}{}} \define@key{show}{remark}[true]{\define@key{hide}{remark}{}}
+  \define@key{show}{myproof}[true]{\define@key{hide}{myproof}{}}
+% This command can be given a comma separated list of names to show,
+% and only these will be shown.  Thus,
+% \ShowEnvirons{example,definition} will show only examples and definitions.
+\newcommand{\ShowEnvirons}[1]
+{\setkeys{show}{#1}\HideEnvirons{%
+    comments,
+    cor,
+    definition,
+    example,
+    proposition,
+    lemma,
+    remark,
+    myproof
+  }}
+\makeatother
+
+% Comment out the next line to see the full text
+\ShowEnvirons{definition, proposition, remark, example, lemma, myproof}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+\setcounter{chapter}{2}
+\chapter{Alon-Boppana Theorem}
+
+
+\section{Statement and Consequences}
+Let $X$ be a $d$-regular graph. From chapter 1, we know $$\frac{d-\lambda_{1}(X)}{2} \le h(X) \le \sqrt{2d(d-\lambda_{1}(X))} $$ Hence, to construct good communication network, our goal is to find graphs with small $\lambda_{1}$. The main result of this chapter places a constraint on how small $\lambda_{1}$ can be. 
+
+\begin{proposition}
+\label{Alan-Boppana}
+If $\{X_{n} \}$ is a sequence of connected $d$-regular graphs with $|X_{n}|\rightarrow \infty $ as $n \rightarrow \infty$, then $$\liminf_{n\rightarrow \infty}\lambda_{1}(X_{n}) \ge 2\sqrt{d-1} $$ That is, for every $\epsilon \ge 0$, there exists an $N >0$ s.t. $\lambda_{1}(X_{n}) > 2\sqrt{d-1} - \epsilon$ for all $n>N$ 
+\end{proposition} 
+\begin{remark} 
+$\lambda_{1}(X_{n})$ is at best a little bit smaller than $2\sqrt{d-1}$. Once we know the very first few terms of $\{\lambda_{1}(X) \}$, we know the (best possible) quality of the graph. 
+\end{remark}
+\begin{figure}[htbp!]
+    \includegraphics[width=1\linewidth]{Screenshot 2024-09-14 at 21.35.44.png}
+    \caption{}
+\end{figure}
+
+\begin{definition}
+    Suppose that $X$ is a $d$-regular graph with $n$ vertices. 
+    \begin{itemize}
+        \item  If $X$ is not bipartite, \define{trivial eigenvalues} is $\lambda_{0}(X) = d $.
+        \item If $X$ is bipartite, \define{trivial eigenvalues} are $\lambda_{0}(X)=d$ and $\lambda_{n-1}(X)=-d $.
+    \end{itemize}
+\end{definition}
+
+
+\begin{definition}
+    Suppose that $X$ is a $d$-regular graph with $n$ vertices. 
+    \begin{itemize}
+        \item  If $X$ is not bipartite, define $\lambda(X) = \max\{|\lambda_{1}(X)|,|\lambda_{n-1}(X)|\}  $.
+        \item If $X$ is bipartite, define $\lambda_(X)= \max\{|\lambda_{1}(X)|, |\lambda_{n-2}(X)| \} $.
+    \end{itemize}
+\end{definition}
+\begin{remark} 
+    \begin{itemize}
+        \item[] % a trick to solve incompatability between \remark envi and itemize
+        \item If $X$ is disconnected, then $\lambda(X)=d $, since in disconnected graphs $\lambda_{1}(X)=\lambda_{0}(X)$. If $X$ is connected, $$\lambda(X) = \max\{|\lambda| \, : \, \lambda \textrm{ is a nontrivial eigenvalue of} X\} $$
+        \item $\lambda(X) \ge \lambda_{1}(X) $. Hence bounding $\lambda_{1}(X)$ below is bounding $\lambda(X) $ below. 
+        \item $d-\lambda(X_{n}) \le d-\lambda_{1}(X_{n}) $, thus $\{X_{n}\} $ is an expander family if $d-\lambda(X_{n})$ is bounded below by some positive constant. 
+        \item[] 
+    \end{itemize}
+\end{remark}
+
+\begin{proposition}
+    (Alon-Boppana) \newline
+    $\{X_{n}\}$ is a sequence of connected $d$-regular graphs with $|X_{n}| \rightarrow \infty $ as $n \rightarrow \infty $, then $$\liminf_{n\rightarrow \infty}\lambda(X_{n}) \ge 2\sqrt{d-1} $$
+\end{proposition}
+\begin{remark}
+    The best (possible) upper bound for $\lambda(X)$ is $2\sqrt{d-1}$, which corresponds to the best (possible) lower bound for $d-\lambda(X_{n})$. \newline
+\end{remark} 
+
+
+\begin{definition}
+    $d$-regular graph $X$ is \define{Ramanujan} if $\lambda(X) \le 2\sqrt{d-1} $
+\end{definition}
+\begin{remark}
+\begin{itemize}
+    \item[]
+    \item For $d \ge 3$, Ramanujan graph must be connected, otherwise $\lambda(X)=d >2\sqrt{d-1} $.
+    \item Suppose $\{X_{n}\} $ is a sequence of $d$-regular Ramanujan graphs. Then $\lambda_{1}(X) \le \lambda(X) \le 2\sqrt{d-1} $. With $d\ge3$, $$h(X_{n}) \ge \frac{d-\lambda_{1}(X_{n})}{2} \ge \frac{d-2\sqrt{d-1}}{2} >0 $$ If $d\ge3$, then any sequence of $d$-regular Ramanujan graphs is an expander family. \newline
+\end{itemize}
+\end{remark}
+
+
+\begin{proposition}
+    Let $X$ be a non-bipartite, $d$-regular graph with vertex set $V$, $A$ be the adjacency operator of $X$. Then $$\lambda(X)= \max_{\substack{f\in L^{2}_{0}(V) \\ ||f||_{2}=1}}|\langle Af , f \rangle_{2}| = \max_{f\in L^{2}_{0}(V)}\frac{|\langle Af, f \rangle_{2}|}{\langle f, f \rangle_{2}} $$
+\end{proposition}
+\begin{myproof}
+    \begin{itemize}
+        \item[]
+        \item Let $n=|V|$. By spectrum theorem, there is an orthonormal basis $\{f_{0}, f_{1}, \dots, f_{n-1}\} $ s.t. $f_{i}$ is associated with eigenvalue $\lambda_{i}=\lambda_{i}(X) $. Also, $f_{0} $ is constant on $V$. 
+        \item Let $f \in L^{2}_{0}(V) $ s.t. $||f||_{2} = 1 $. As in the eigenvalue version of Rayleigh-Ritz proposition, $f = c_{1}f_{1} + \dots + c_{n-1}f_{n-1}$ for some $c_{i} \in \C$.
+        \item Hence
+        \begin{align*}
+            |\langle Af, f \rangle_{2}| &= |\langle \sum^{n-1}_{i=1}c_{i}\lambda_{i}f_{i}, \sum^{n-1}_{j=1}c_{j}f_{j} \langle_{2} | \\ &\le \sum^{n-1}_{i=1}\sum^{n-1}_{j=1}c_{i}\overline{c_{j}}|\lambda_{i}\langle f_{i}, f_{j}\rangle_{2}| \\ &= \sum^{n-1}_{i=1}c_{i}\overline{c_{i}}|\lambda_{i}| \\ &\le \lambda(X)\sum^{n-1}_{i=1}c_{i}\overline{c_{i}} = \lambda(X)||f||^{2}_{2} = \lambda(X)
+        \end{align*}.
+        \item So $$\lambda(X) \ge \max_{\substack{f\in L^{2}_{0}(V) \\ ||f||_{2}=1 }}|\langle Af, f \rangle_{2}|$$
+        \item Now we show the upper bound can be achieved. If $\lambda(X) = \lambda_{1}(X)$, let $f=f_{1}$. Otherwise, let $f =f_{n-1} $. 
+    \end{itemize}
+\end{myproof}
+\begin{remark}
+    \begin{itemize}
+        \item[]
+        \item It can be shown: $$\lambda(X) = \max_{f\in L^{2}_{0}(V, \R) }\frac{|\langle Af, f\rangle_{2}|}{\langle f,f \rangle_{2}} $$ which corresponds to the restricted version of Rayleigh-Ritz. 
+        \item Let $X$ be a bipartite $d$-regular graph with vertex set $V$. Then $$\lambda(X) \le \max_{\substack{f\in L^{2}_{0}(V) \\ ||f||_{2}=1 }}|\langle Af, f \rangle_{2}| = d  $$ with equality iff $X$ is disconnected. 
+    \end{itemize}
+\end{remark}
+
+
+
+\section{First Proof: The Rayleigh-Ritz Method}
+A proof for Proposition 3.1.
+
+\begin{proposition}
+    Let $X$ be a connected $d$-regular graph. If $diam(X) \ge 4 $, then $$\lambda_{1}(X) > 2\sqrt{d-1}-\frac{2\sqrt{d-1}-1}{\lfloor \frac{1}{2}diam(X) -1 \rfloor } $$
+\end{proposition}
+\begin{myproof}
+    \begin{itemize}
+        \item[] 
+        \item We first show Proposition 3.7. implies Proposition 3.1. 
+        \item Fix a vertex $v$ of $X$. The number of walks of length 1 starting at $v$ is $d$. Length 2 is $d^{2}$ 
+        \item In general, the number of walks of length $a$ starting at $v$ is $d^{a} $. Note that a walk of length $a$ contains at most $a+1$ vertices. 
+        \item We can cover the entire graph by taking all walks of length $diam(X)$ from our fixed vertex $v$. There are $d^{diam(X)}$ such walks,each containing at most $diam(X)+1$ vertices. 
+        \item Hence $$|X| \le (diam(X)+1)d^{diam(X)} $$
+        \item Let $\{X_{n}\} $ be a sequence of connected, $d$-regular graphs s.t. $|X_{n}| \rightarrow \infty $ as $n \rightarrow \infty $, so $$\frac{2\sqrt{d-1}-1}{\lfloor \frac{1}{2}diam(X)-1 \rfloor } $$ approaches 0 as $n \rightarrow \infty $. Proposition 3.1 follows. 
+        \item[]
+    \end{itemize}
+\end{myproof}
+
+\begin{figure}[htbp!]
+    \includegraphics[width=1\linewidth]{Screenshot 2024-09-17 at 21.35.31.png}
+    \caption{}
+\end{figure}
+
+\begin{myproof}
+    For Proposition 3.7.
+    \begin{itemize}
+        \item Proof idea: Firstly, we pick two vertices $v_{1}, v_{2} $ that are as far apart as possible in the graph. Secondly, construct $f \in L^{2}_{0}(V, \R) $ that has local maxima at $v_{1}, v_{2} $ and decreases rapidly as we move away from $v_{1}, v_{2} $. By Rayleigh-Ritz, $\lambda_{1}(X) \ge d - \frac{\langle \Delta f, f \rangle_{2} }{\langle f,f \rangle_{2} }  $. Thirdly, we calculate $\langle f,f \rangle_{2} $. Lastly, we give an upper bound on $\langle \Delta f,f \rangle_{2} $, thus having a lower bound for $\lambda_{1}(X) $
+        \item Throughout the proof, let $b = \lfloor \frac{1}{2}diam(X)-1 \rfloor $, $q=d-1$, edge multiset $E$, vertex set $V$.
+        \item Step 1: Construct $f$. 
+        \begin{itemize}
+            \item Let $v_{1}, v_{2} $ be two vertices s.t. $dist(v_{1}, v_{2}) \ge 2b + 2 $. Define the sets \begin{align*}
+            A_{i} &= \{v \in V \, \rvert \, dist(v,v_{1}) = i \} \\
+            B_{i} &= \{v \in V \, \rvert \, dist(v, v_{2}) = i \}
+            \end{align*} for $i =0,1,\cdots,b$
+            \item Figure 3.2 provides an example for this construction in a 3-regular graph. 
+            \item $A_{0}, A_{1}, \cdots, A_{b}, B_{1}, \cdots, B_{b} $ are disjoint sets. 
+            \item Suppose not, then $x \in A_{i} \cap B_{j} $ for some $0\le i,j \le b$ ($A_{i} \cap A_{j}$ is empty by definition, same for $B$). Then, $dist(v_{1}, v_{2}) \le dist(v_{1}, x) + dist(x,v_{2}) \le 2b < 2b+2 $, contradiction. 
+            \item Observation (useful for step 3): If $x \in A_{i} $ where $1 \le i \le b-1$, then there is at least one vertex from $A_{i-1} $ that is adjacent to $x$, and at most $q$ vertices from $A_{i+1} $ that are adjacent to $x$.
+            \item Let $$A = \bigcup^{b}_{i=0}A_{i} \; \; \; \textrm{and} \; \; \; B= \bigcup^{b}_{i=0}B_{i} $$ No vertex of $A$ is adjacent to a vertex of B. 
+            \item Suppose $x \in A, y\in B$ are adjacent. Then $\dist{v_{1}, v_{2}} \le \dist{v_{1}, x} + \dist{x,y} + \dist{y,v_{2}} \le 2b+1 < 2b+2 $, contradiction.
+            \item Define $f\in L^{2}_{0}(V, \R) $ as $$f(x) = \left\{ \begin{array}{ll} \alpha & x \in A_{0} \\ \alpha q^{-(i-1)/2} & x \in A_{i} for i \ge 1 \\ 1 & x \in B_{0} \\ q^{-(i-1)/2} & x\in B_{i} for i \ge 1 \\ 0 & \textrm{otherwise,}  \end{array} \right. $$ where $\alpha \in \R$ will be chosen next. 
+            \item Let $f_{0}$ be the function constant on 1 on all vertices, then \begin{align*}
+                \inner{f,f_{0}}_{2} &= \sum_{x\in V}f(x)f_{0}(x) \\
+                &= \alpha \left( \abs{A_{0}} + \sum^{b}_{i=1}q^{-(i-1)/2}\abs{A_{i}}  \right) + \left( \abs{B_{0}} + \sum^{b}_{i=1}q^{-(i-1)/2}\abs{B_{i}}  \right) \\ &= \alpha c_{0} + c_{1} 
+            \end{align*}
+            for some real numbers $c_{0}, c_{1} > 0 $. Let $\alpha = -c_{1}/c_{0} $, then we have $\inner{f,f_{0}}_{2}=0 $
+        \end{itemize}
+        \item Step 2: Compute $\inner{f,f}_{2}$. 
+        \begin{align*}
+            \inner{f,f}_{2} &= \sum_{x\in V}f(x)\overline{f(x)} = \sum^{b}_{i=0}\sum_{x\in A_{i}}\abs{f(x)}^{2}+\sum_{i=0}^{b}\sum_{x\in B_{i}}\abs{f(x)}^{2} \\ &= S_{A}+S_{B}
+        \end{align*}
+        where (by plugging in f)
+        \begin{align*}
+            S_{A} &= \alpha^{2}+\sum^{b}_{i=1}\abs{A_{i}}\alpha^{2}q^{-(i-1)} \\
+            S_{B} &= 1 + \sum_{i=1}^{b}\abs{B_{i}}q^{-(i-1)}
+        \end{align*}
+        clearly $S_{A}$ and $S_{B} $ are positive. 
+        \item Step 3: Upper bound for $\inner{\Delta f, f}_{2} $
+        \begin{itemize}
+            \item Give an orientation to the edges of $X$. Recall from chapter 1 that Laplacian does not depend on orientation. From Proposition 1.21, we have that $$\inner{\Delta f,f}_{2} = \sum_{e\in E}(f(e^{+}) - f(e^{-}))^{2} = C_{A}+C_{B} $$ where \begin{align*}
+                C_{A} &= \sum_{\substack{e\in E \\ e^{+} \, \textrm{or} \, e^{-} \in A }}(f(e^{+}) - f(e^{-}))^{2} \\
+                C_{B} &= \sum_{\substack{e\in E \\ e^{+} \, \textrm{or} \, e^{-} \in B }}(f(e^{+}) - f(e^{-}))^{2}
+            \end{align*}
+            \item Then for $C_{A}$ 
+            \begin{align*}
+                C_{A} &= \sum^{b-1}_{i=0}\sum_{x\in A_{i}}\sum_{y\in A_{i+1}}A_{x,y}(f(x)-f(y))^{2} + \sum_{x\in A_{b}}\sum_{y\notin A}A_{x,y}(f(x)-0)^{2} \\
+                &\le \sum^{b-1}_{i-1}q\abs{A_{i}}(q^{-(i-1)/2}-q^{-i/2})^{2}\alpha^{2} + q\abs{A_{b}}q^{-(b-1)}\alpha^{2} \\ 
+                &= \alpha^{2}\sum^{b-1}_{i-1}q\abs{A_{i}}(q^{1/2}-1)^{2}q^{-i} + \alpha^{2}((q^{1/2}-1)^{2}+2q^{1/2}-1)\abs{A_{b}}q^{-(b-1)} \\
+                &= \alpha^{2}(q^{1/2}-1)^{2}(\sum^{b}_{i=1}\abs{A_{i}}q^{-(i-1)}) + \alpha^{2}(2q^{1/2}-1)\abs{A_{b}}q^{-(b-1)} \\
+                &= (q^{1/2}-1)^{2}(S_{A}-\alpha^{2}) + \alpha^{2}(\frac{2\sqrt{q}-1}{b}) b \abs{A_{b}} q^{-(b-1)} \\ 
+                &\le (q^{1/2}-1)^{2}(S_{A}-\alpha^{2}) + (\frac{2\sqrt{q}-1}{b})(S_{A}-\alpha^{2}) \\
+                &= (q+1-2\sqrt{q}+\frac{2\sqrt{q}-1}{b})(S_{A}-\alpha^{2}) \\
+                &< (q+1-2\sqrt{q}+\frac{2\sqrt{q}-1}{b})S_{A}
+            \end{align*}
+            \begin{itemize}
+                \item[0:1] Adjacency relationship comes from definition of $A_{i}$
+                \item[1:2] Plug in $f$. When $i=0$, $f(x)-f(y)=0$. Also, by observation, for $x \in A_{i}$, at most $q$ adjacent vertices in $A_{i+1} $. Similar for $x \in A_{b} $, at most $q$. 
+                \item[2:3] $(q^{-(i-1)/2}-q^{-i/2})^{2} = (q^{1/2}-1)^{2}q^{-i}$, and $q = (q^{1/2}-1)^{2}+2q^{1/2}-1 $ 
+                \item[3:4] Combine part of latter term into the former, so the former is the sum from 1 to b (instead of b-1). 
+                \item[4:5] Note $S_{A} -\alpha^{2} = \alpha^{2}\sum^{b}_{i=1}\abs{A_{i}}q^{-(i-1)} $.
+                \item[5:6] Again by observation, for $x \in A_{i} $, at most $q$ vertices from $A_{i+1} $ are adjacent to $x$. Since every vertex of $A_{i+1} $ must be adjacent to some vertex in $A_{i} $, we have $\abs{A_{i+1}}\le q\abs{A_{i}}$ for $1\le i \le b-1$. Same argument works for $B_{i} $ as well. So $$\abs{A_{1}} \ge q^{-1}\abs{A_{2}} \ge \cdots \ge q^{-(b-1)}\abs{A_{b}} $$
+                so $q^{-(b-1)}\abs{A_{b}}$ is the minimum among all such forms, thus, $$\alpha^{2}b\abs{A_{b}}q^{-(b-1)} = \alpha^{2}\sum^{b}_{i=1}\abs{A_{b}}q^{-(b-1)} \le \alpha^{2}\sum^{b}_{i=1}\abs{A_{i}}q^{-(i-1)} = S_{A}-\alpha^{2} $$ 
+                \item[6:7] Just computation. Also, since $X$ is connected (thus $\diam{X}$ finite) and $\diam{X} \ge 4$, we have $d \ge 2$ (only connected $d=1$ regular graph has only one edge). Then, $(2\sqrt{q}-1)/b>0$ and $(q^{1/2}-1)^{2} >0$. Hence the coefficient is positive. 
+                \item[7:8] Positive coefficient and positive $S_{A}-\alpha^{2}$
+            \end{itemize}
+            \item Similarly, $$C_{B} < (q+1-2\sqrt{q}+\frac{2\sqrt{q}-1}{b})S_{B}  $$
+            \item Hence $$\inner{\Delta f,f}_{2} = C_{A}+C_{B} < (q+1-2\sqrt{q}+\frac{2\sqrt{q}-1}{b})(S_{A}+S_{B})$$
+        \end{itemize}
+        \item Step 4: Rayleigh-Ritz, put $\inner{\Delta f, f}_{2} $ and $\inner{f,f}_{2} $ together. 
+        \begin{align*}
+            d-\lambda_{1}(X) 
+            &= \min_{\substack{g\in L^{2}_{0}(V) \\ \norm{g}_{2}=1 }}\inner{\Delta g, g}_{2} \\
+            &\le \frac{\inner{\Delta f, f}_{2}}{\inner{f,f}_{2}} \\
+            &= \frac{C_{A}+C_{B}}{S_{A}+S_{B}} \\ 
+            &< (q+1-2\sqrt{q}+\frac{2\sqrt{q}-1}{b}) \; \; \textrm{(by final result of Step 3)} \\
+            &= d-2\sqrt{d-1}+\frac{2\sqrt{d-1}-1}{b}   
+        \end{align*}
+        Hence $$\lambda_{1}(X) > 2\sqrt{d-1}-\frac{2\sqrt{d-1}-1}{\lfloor \frac{1}{2}diam(X)-1 \rfloor}$$
+    \end{itemize}
+\end{myproof}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\end{document}
