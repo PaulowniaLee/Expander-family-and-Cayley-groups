@@ -1,0 +1,829 @@
+\documentclass{book}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{graphicx} % Required for inserting images
+\usepackage{amsmath} % basic math stuff, also aligned environment 
+\usepackage{amsfonts} % defeines blackboard bold fonts for \Z, \R
+\usepackage{tikz} % Drawing environment 
+\usepackage{amsthm} % AMS theorem defining stuff
+\usepackage{amssymb} % good looking empty set
+\usepackage{leftindex} % let superscript
+
+% Formating stuff
+\usepackage{hyphenat} % forbid use of hyphen
+%complete elimination of hyphen 
+\righthyphenmin = 100
+\lefthyphenmin = 100
+%取消段前空格
+\setlength{\parindent}{0pt}
+
+% Makes section headings and cross references act like links
+\usepackage[colorlinks,unicode]{hyperref}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Create simple shortcut commands.  Almost everyone who uses LaTeX
+% creates commands like thes.
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\C}{\mathbb{C}}
+
+% this is to highlight words that are being defined and enter.
+\newcommand{\define}[1]{\textbf{#1}}
+
+% Symmetric inclusion symbol 
+\newcommand{\syin}{$\subset$\kern-0.48em\raisebox{.20ex}{\tiny S}$\,$}
+%\kern 左右移动(-为向左)，\raisebox 上下移动(-为向下)
+% Note this symbol does not work in math mode.
+
+% diam
+\newcommand{\diam}[1]{\textrm{diam}( #1 )}
+% inner product 
+\newcommand{\inner}[1]{\langle #1 \rangle}
+% norm 
+\newcommand{\norm}[1]{\lVert #1 \rVert}
+% dist
+\newcommand{\dist}[1]{\textrm{dist}( #1 )}
+% absolute value 
+\newcommand{\abs}[1]{\lvert #1 \rvert }
+% Cayley graph 
+\newcommand{\Cay}[1]{\textrm{Cay}( #1 )}
+% Cos graph
+\newcommand{\Cos}[1]{\textrm{Cos}( #1 )}
+% Automorphism group 
+\newcommand{\Aut}[1]{\textrm{Aut}( #1 )}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% The next page or two of stuff is devoted to creating and
+% manipulating the environments for lemma, proof, example, etc.
+% The first part is pretty simple, and almost everyone has commands
+% like this in every paper, article, book, etc.  
+% 
+% We start with things like lemmas, theorems, etc.
+
+%注释
+%\newtheorem{env name}{text}[parent counter]
+%\newtheorem{env name}[shared counter]{text}
+%parent counter: numbering will resteart whenever that sectional level is encountered
+%shared counter: if specificed, numbering will progress sequentially for 
+%all theorem element using this counter
+
+\theoremstyle{definition} 
+%adds extra space above and below, but sets the text in roman
+%recommended for definitions, conditions, problems, and examples
+
+\newtheorem{lemma}{Lemma}[chapter]
+\newtheorem{proposition}[lemma]{Proposition}
+\newtheorem{corollary}[lemma]{Corollary}
+\newtheorem{definition}[lemma]{Definition}
+
+%自定义新的theorem environment
+\newtheoremstyle{remarkstyle}
+    {\topsep}%   space above, empty for `usual value'
+    {\topsep}%   space below
+    {}%          body font, input \itshape for italian
+    {}%          indent amount 
+    {}%          thm head font 
+    {}%          Punctuation after thm head
+    {\newline}%  Space after thm head: \newline = linebreak
+    {}%          Thm head spec
+\theoremstyle{remarkstyle}
+\newtheorem*{remark}{Remark}%[chapter] 
+\newtheorem*{example}{Example}%[chapter]
+\newtheorem*{myproof}{Proof}%[chapter]
+%this formating (* and %[chapter]) elminates numbering for theorem environment
+
+%theorem之间的空间是手动调的，在最后加个\newline或者item[]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% The stuff that follows is a bit tricky, and is well more than most
+% people do with LaTeX.  The basic idea is that I want to be able to
+% show only examples, or only definitions, or hide only proofs, etc.  
+
+
+\makeatletter
+% the following key values give the set up for hiding certain
+% environemnts. Note that "true" is just a dummy value.  It would work
+% equally well with "foo".  Each one of these redefines the outer
+% environment for an atom to turn the whole thing into a hidden
+% comment.  Note that the environments theorem, example, etc. do not
+% have to be written in any special way for hide and show to work.
+% They get clobbered by hide.  
+  \define@key{hide}{lemma}[true]{\renewenvironment{lemma}{\comment}{\endcomment}}
+  \define@key{hide}{comments}[true]{\renewenvironment{comments}{\comment}{\endcomment}}
+  \define@key{hide}{corollary}[true]{\renewenvironment{corollary}{\comment}{\endcomment}}
+  \define@key{hide}{definition}[true]{\renewenvironment{definition}{\comment}{\endcomment}}
+  \define@key{hide}{example}[true]{\renewenvironment{example}{\comment}{\endcomment}}
+  \define@key{hide}{proposition}[true]{\renewenvironment{proposition}{\comment}{\endcomment}}
+  \define@key{hide}{remark}[true]{\renewenvironment{remark}{\comment}{\endcomment}}
+    \define@key{hide}{myproof}[true]{\renewenvironment{myproof}{\comment}{\endcomment}}
+% Now this command can be given a comma separated list of names to
+% hide.  Thus, \HideEnvirons{ example, proof} would hide all examples
+% and proofs.
+\newcommand{\HideEnvirons}[1]{\setkeys{hide}{#1}}
+
+
+% The \ShowEnvirons command works like this: if it's argument is foo,
+% it redefines the *hide* family key for foo to do nothing.  Then, it
+% issues a \HideEnvirons command containing a list of all the atom
+% types.  So, everything is hidden *unless* the hide-family key has
+% been redefinied.
+  \define@key{show}{lemma}[true]{\define@key{hide}{lemma}{}}
+  \define@key{show}{comments}[true]{\define@key{hide}{comments}{}}
+  \define@key{show}{corollary}[true]{\define@key{hide}{corollary}{}}
+  \define@key{show}{definition}[true]{\define@key{hide}{definition}{}}
+  \define@key{show}{example}[true]{\define@key{hide}{example}{}}
+  \define@key{show}{proposition}[true]{\define@key{hide}{proposition}{}} \define@key{show}{remark}[true]{\define@key{hide}{remark}{}}
+  \define@key{show}{myproof}[true]{\define@key{hide}{myproof}{}}
+% This command can be given a comma separated list of names to show,
+% and only these will be shown.  Thus,
+% \ShowEnvirons{example,definition} will show only examples and definitions.
+\newcommand{\ShowEnvirons}[1]
+{\setkeys{show}{#1}\HideEnvirons{%
+    comments,
+    corollary,
+    definition,
+    example,
+    proposition,
+    lemma,
+    remark,
+    myproof
+  }}
+\makeatother
+
+% Comment out the next line to see the full text
+\ShowEnvirons{definition, proposition, remark, example, lemma, myproof, corollary}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+\setcounter{chapter}{3}
+\chapter{Diameters of Cayley Graphs and Expander Families}
+% Tips facing very long chapter titles 
+% \chapter[medium-length title for Table of contents, if wanted]{full title name}
+% \chaptermark{short title for running headers}
+\chaptermark{Graph Diameters}
+
+
+
+Good communication networks = Messages spread quickly = Small diameters \newline
+In this chapter, we show necessary conditions for expander family related to diameters (namely logarithmic diameter), and these conditions can be further related to group structures. There is no equivalent conditions: we illustrate this in the end of the chapter by constructing an "almost" expander family example. 
+
+\section{Expander Families have Logarithmic Diameter}
+\begin{definition}
+    Graph $X$, vertex $v$ of $X$, non-negative integer $r$. Define the \define{closed ball} of radius r centred at v as $B_{r}[v]$, the \define{sphere} of radius r centred at v as $S_{r}[v]$.
+    \begin{align*}
+        B_{r}[v] &= \{ w \in V_{X} \, \vert \, \dist{v,w} \le r\} \\
+        S_{r}[v] &= \{ w \in V_{X} \, \vert \, \dist{v,w} = r\}
+    \end{align*} 
+\end{definition}
+\begin{remark}
+    \begin{itemize}
+        \item[]
+        \item This terminology resembles that of metric spaces. Recall that dist is a metric. 
+        \item By definition, $B_{r}[v], S_{r}[v] \subset V_{X}$ for any $r$.
+        \item[] 
+    \end{itemize}
+\end{remark}
+
+
+\begin{lemma}
+    $\{X_{n}\}$ is a sequence of $d$-regular graphs with $\abs{X_{n}} \rightarrow \infty $ and $d \ge 3$. Then, $\diam{X}$ grows at least logarithmically. Equivalently, $\diam{X_{n}} = \Omega(\ln X_{n})$. 
+\end{lemma}
+\begin{myproof}
+    \begin{itemize}
+        \item[]
+        \item Consider the case with $\diam{X} \ge 3$. Let $v$ be a vertex of $X$. Suffice to show $\diam{X} \ge \log_{d}\abs{X} $
+        \item Note $\abs{S_{0}[v]}=1$ and $\abs{S_{1}[v]}\le d$ (strict $<$ for loops). 
+        \item If $j \ge 2$, then for any vertex $w$ of $S_{j}[v] $, at least one edge incident ot $w$ is also incident to a vertex in $S_{j-1}[v] $. Hence, no more than $d-1$ of these edges are incident to vertices in $S_{j+1}[v] $. Thus, $\abs{S_{j+1}[v]}\le (d-1)\abs{S_{j}[v]}$, 
+        \item Induction, $\abs{S_{j}[v]} \le d(d-1)^{j-1}$ (since $\abs{S_{1}[v]}\le d$).
+        \item For any $r$, $B_{r}[v] $ is the disjoint union of $S_{0}[v], S_{1}[v], \dots, S_{r}[v] $, thus $$\abs{B_{r}[v]} \le 1+d \left( \sum_{j=0}^{r-1} (d-1)^{j} \right) $$. 
+        \item RHS is a polynomial in $d$ of degree $r$, thus controlled by $d^{r}$. Claim: for $r \ge 3$, $\abs{B_{r}[v]} \le d^{r} $. 
+        \item Note for $r \ge 3$, $0 \le d^{2}-3d+1 $, thus $(d-1)^{3} \le d^{2}(d-2) $, thus $d(d-1)^{r} = (d-1)^{r-3}(d-1)^{3} \le d^{r-3}d^{2}(d-2) = d^{r-1}(d-2) $, thus $d(d-1)^{r}-2 \le d(d-1)^{r} \le d^{r}(d-2) $. 
+        \item Hence, $$ \abs{B_{r}[v]} \le 1+d \left( \sum_{j=0}^{r-1} (d-1)^{j} \right) = 1 + d \left[ \frac{(d-1)^{r}-1}{d-2} \right] \le d^{r} $$
+        \item Let $r = \diam{X} $, thus $\abs{X}=\abs{B_{r}[v]} \le d^{r} $, so $\diam{X} \ge \log_{d}\abs{X} $
+    \end{itemize}
+\end{myproof}
+\begin{remark}
+    Logarithmic diameter growth is the slowest possible case. Our next goal is show expander family must achieve this slowest growth case. \newline 
+\end{remark}
+
+
+\begin{lemma}
+    Connnected finite graph $X$. Let $a >1$. Suppose that for any vertex $v$ of $X$, $\abs{B_{r-1}[v]} \le \frac{1}{2}\abs{X}$ always implies that $\abs{B_{r}[v]}\ge a^{r} $. Then $$\diam{X}\le \left( \frac{2}{\ln a} \right) \ln \abs{X}  $$
+\end{lemma}
+\begin{myproof}
+    \begin{itemize}
+        \item[]
+        \item $w_{1}, w_{2} $ two vertices of $X$. Let $r_{1} $ be the smallest non-negative integer s.t. $\abs{B_{r_{1}}[w_{1}]} > \frac{1}{2}\abs{X}$. Such $r$ must exist since $X$ is connected thus having finite diameter. 
+        \item Then by assumption $\abs{B_{r_{1}}[w_{1}]} \ge a^{r_{1}} $, since $r_{1} -1 < r_{1} $ and therefore $\abs{B_{r_{1}-1}[w_{1}]} \le \frac{1}{2}\abs{X} $. 
+        \item Similarly, let $r_{2} $ be the smallest non-negative integer s.t. $\abs{B_{r_{2}}[w_{2}]} > \frac{1}{2}\abs{X}$, thus $\abs{B_{r_{2}}[w_{2}]} \ge a^{r_{2}} $
+        \item Note $\abs{B_{r_{1}}[w_{1}]}+\abs{B_{r_{2}}[w_{2}]}> \abs{X}$, so $B_{r_{1}}[w_{1}] \cap B_{r_{2}}[w_{2}] \ne \varnothing $. Let $w_{3} \in B_{r_{1}}[w_{1}] \cap B_{r_{2}}[w_{2}]  $. 
+        \item Then $\dist{w_{1}, w_{3}}\le r_{1}, \; \dist{w_{2}, w_{3}} \le r_{2} $, so \begin{align*}
+        \dist{w_{1}, w_{2}} &\le \dist{w_{1}, w_{3}} + \dist{w_{3}, w_{2}} \\
+        &\le \log_{a}\abs{B_{r_{1}}[w_{1}]} + \log_{a}\abs{B_{r_{2}}[w_{2}]} \\
+        &\le \left( \frac{2}{\ln a} \right) \ln\abs{X}
+        \end{align*}
+        $(B_{r_{1}}[w_{1}], B_{r_{2}}[w_{2}]$ are all subset of $V_{X}) $
+        \item Since this holds for arbitrary $w_{1}, w_{2} $, done. 
+        \item[] 
+    \end{itemize}
+\end{myproof}
+
+
+\begin{proposition}
+    $X$ is a connected $d$-regular graph. Let $C = 1+\frac{h(X)}{d} $. Then $$
+    \diam{X} \le \left( \frac{2}{\ln C} \right) \ln\abs{X}
+    $$
+\end{proposition}
+\begin{remark}
+    If $h(X_{n} )$ is bounded away from 0 (hence an expander family), then $\diam{X_{n} }$ grows at most logarithmically as a function of $\abs{X_{n} }$. From Lemma 4.2, we know this is the slowest growth possible.
+\end{remark}
+\begin{myproof}
+    \begin{itemize}
+        \item[]
+        \item Let $v$ be a vertex. Suppose $\abs{B_{r-1}[v]} \le \frac{1}{2}\abs{X}$, then by definition of isoperimetric constant, $$
+        \abs{\partial B_{r-1}[v]} \ge h(X)\abs{B_{r-1}[v]}
+        $$
+        \item Any edge in $\partial B_{r-1}[v]$ must be incident to a vertex in $S_{r}[v] $. Since $X$ is $d$-regular, we have $$
+        \abs{S_{r}[v]} \ge \frac{\partial B_{r-1}[v]}{d} \ge \frac{h(X)}{d}\abs{B_{r-1}[v]}
+        $$
+        \item Note $B_{r}[v] $ is the disjoint union of $B_{r-1}[v]$ and $S_{r}[v]$, thus $$
+        \abs{B_{r}[v]} = \abs{B_{r-1}[v]} + \abs{S_{r}[v]} \ge \abs{B_{r-1}[v]} + \frac{h(X)}{d}\abs{B_{r-1}[v]} = C\abs{B_{r-1}[v]}. 
+        $$
+        \item By induction, $\abs{B_{r}[v]} \ge C^{r} $, which is implied by $\abs{B_{r-1}[v]} \le \frac{1}{2}\abs{X}$. Hence, by Lemma 4.3, substitute $a$ by $C$, done. 
+        \item[]
+    \end{itemize}
+\end{myproof}
+
+
+\begin{definition}
+    $\{X_{n} \}$ has logarithmic diameter if $\diam{X_{n}} = O(\ln\abs{X_{n}}) $ \newline
+\end{definition}
+
+
+\begin{corollary}
+    Non-negative integer $d$. If $\{X_{n}\} $ is a family of $d$-regular expanders, then $\{X_{n}\} $ has logarithmic diameter. \newline
+\end{corollary}
+
+
+\section{Diameters of Cayley Graphs}
+\begin{definition}
+    Let $\{G_{n} \} $ be a sequence of finite groups. We say $\{G_{n} \}$ has logarithmic diameter if for some non-negative integer $d$, there exists $\{\Gamma_{n} \}$ s.t. $\Gamma_{n} \syin G_{n} $ and $\abs{\Gamma}=d$ for each n, so the sequence of Cayley graphs $\{ \Cay{G_{n}, \Gamma_{n}} \}$ has logarithmic diameter. \newline
+\end{definition}
+
+
+\begin{definition}
+    Let $\Gamma$ be a set, $n$ be a positive integer. Then a \define{word} of length $n$ in $\Gamma$ is an element of the Cartesian product $\Gamma \times \dots \times \Gamma = \Gamma^{n} $. If $\Gamma \subset G $ for some group G and $w = (w_{1}, \dots, w_{n}) $ is a word in $\Gamma$, then $w$ evaluates to $g$ in $G$ if $g = w_{1}\dots w_{n} $.
+\end{definition}
+\begin{remark}
+    Clearly, an element in $G$ can be expressed as different words. It's also possible that for certain $\Gamma$, some elements in $G$ cannot be expressed as any word. An example is $G=\Z_{10}, \; \Gamma = \{0,2,4,6,8\} $ \newline
+\end{remark}
+
+
+\begin{definition}
+    Group $G$, $\Gamma \subset G$, $g \in G$ and can be expressed as a word in $\Gamma$. The \define{word norm} of $g$ in $\Gamma$ is the minimal length of any word in $\Gamma$ that evaluates to $g$. By convention, identity element has word norm 0. \newline
+\end{definition}
+
+
+\begin{proposition}
+    Finite group $G$. Let $\Gamma$ symmetric in $G$ and $X = \Cay{G, \Gamma}$ Then:
+    \begin{itemize}
+        \item[1] $X$ is connected iff every element of $G$ can be expressed as a word in $\Gamma$.
+        \item[2] If $a,b\in G$ and there is a walk in $X$ from $a$ to $b$, then the distance from $a$ to $b$ is the word norm of $a^{-1}b $ in $\Gamma$.
+        \item[3] The diameter of $X$ equals the maximum of the word norms in $\Gamma$ of elements of $G$.  
+    \end{itemize}
+\end{proposition}
+\begin{myproof}
+    \begin{itemize}
+        \item[]
+        \item[1] Equivalent to say $\Gamma$ generates $G$.
+        \item[2] 
+        \begin{itemize}
+            \item Let $a = g_{0}, b=g_{n} $, and $(g_{0}, g_{1}, \dots, g_{n}) $ be a walk of length $n$ in $X$ from $a$ to $b$. 
+            \item Let $\gamma_{j} = g^{-1}_{j-1}g_{j} $ for $j = 1, \dots, n$. Then since there is an edge from $g_{j-1} $ to $g_{j} $, we have $\gamma_{j} \in \Gamma $ and $(\gamma_{1}, \dots, \gamma_{n}) $ is a word of length $n$ in $\Gamma$ that evaluates to $a^{-1}b $. 
+            \item Reversing this procedure, we see that every word of length $n$ in $\Gamma$ that evaluates to $a^{-1}b $ corresponds to a path of length $n$ in $X$ from $a$ to $b$. 
+            \item Thus, the distance from $a$ to $b$ is the minimal length of all walks from $a$ to $b$, which equals to the minimal length of all words hence the word norm of $a^{-1}b$.
+        \end{itemize}
+        \item[3] Natural implication of (2).
+        \item[] 
+    \end{itemize}
+\end{myproof}
+
+
+\section{Abelian Groups Never Yield Expander Families}
+\begin{lemma}
+    The number of solutions to the equation $a_{1} + \dots + a_{n} = k $, where $a_{i} $ are non-negative integers, is $$C^{k}_{n+k-1} $$
+\end{lemma}
+\begin{myproof}
+    Equivalently, consider partitioning $k+n$ balls into $n$ boxes, and each box has at least one ball. You can place $n-1$ boards between these balls to make the partition, and there are $k+n-1$ spaces where you can place boards. \newline
+\end{myproof}
+
+\begin{lemma}
+    If $a,b \in \N, \; b\le a $, then $$
+    C^{b}_{a} \le (a-b+1)^{b}
+    $$ 
+\end{lemma}
+\begin{myproof}
+    Observe that if $0 < q \le p$, then $\frac{p+1}{q+1} \le \frac{p}{q} $. Hence 
+    $$
+    \frac{a}{b} \le \frac{a-1}{b-1} \le \dots \le \frac{a-b+2}{2} \le \frac{a-b+1}{1}
+    $$ 
+    So $$
+    C^{b}_{a} = \frac{a}{b}\frac{a-1}{b-1}\dots\frac{a-b+2}{2}\frac{a-b+1}{1} \le (a-b+1)^{b}
+    $$ 
+    This bound is not sharp, but suffices for our purpose. \newline
+\end{myproof}
+
+
+\begin{proposition}
+    No sequence of finite abelian groups has logarithmic diameter. Therefore, no sequence of abelian groups yields an expander family.
+\end{proposition}
+\begin{remark}
+    If a sequence of finite groups admits an unbounded sequence of abelian groups as quotients, then by Quotients Nonexpansion Principle, it does not yield an expander family.
+\end{remark}
+\begin{myproof}
+    \begin{itemize}
+        \item[]
+        \item Finite abelian group $G$; $\Gamma$\syin$G$; $d=\abs{\Gamma}$; $\gamma_{1}, \dots, \gamma_{d} $ be the elements of $\Gamma$. Let $X=\Cay{G,\Gamma}$, $k=\diam{X}$ Since $\Gamma$ generates $G$, $k$ is finite, and every element of $G$ can be expressed as a word in $\Gamma$ of length less than $k$.
+        \item Since $G$ is abelian, we can rearrange the elements in the word, so that every element of $G$ is of the form $$
+        e^{a_{0}}\gamma^{a_{1}}_{1}\dots\gamma^{a_{d}}_{d}
+        $$
+        where $e$ is the identity and $\sum^{d}_{i=0}a_{i}=k $, each $a_{i} $ non-negative integer. (without identity, the sum of $a_{i} $ would not be constant)
+        \item By Lemma 4.11, the number of distinct elements of this form is bounded above by $C^{k}_{k+d} $. Then, by Lemma 4.12, $\abs{X} \le C^{k}_{k+d} = C^{d}_{k+d} \le (k+1)^{d} $, so $\diam{X} \ge \abs{X}^{1/d}-1 $
+        \item For $\{X_{n}\} $, we have $\diam{X_{n}}\ge \abs{X_{n}}^{1/d}-1 $, but RHS is a roof function, which grows faster than logarithmic functions, done.
+        \item[] 
+    \end{itemize}
+\end{myproof}
+
+
+\section{Diameters of Subgroups and Quotients}
+Diameter's version of Subgroup Nonexpansion Principle, where we connect subgroup and original with spanning subgraph. \newline
+
+\begin{definition}
+    Graph $X,Y$. Define composite graph of X and Y, $C(X \times Y)$, as follows.
+    \begin{itemize}
+        \item Vertex set: $X\times Y$
+        \item Set of edges between $(x_{1}, y_{1}) $ and $(x_{2}, y_{2}) $ is the set of pairs $(e_{1},e_{2}) $, s.t. $e_{1} $ is an edge in $X$ between $x_{1}$ and $x_{2} $, and $e_{2} $ is an edge in $Y$ between $y_{1}$ and $y_{2} $. 
+        \item[] 
+    \end{itemize}
+\end{definition}
+
+\begin{example}
+See figure 4.1.
+    \begin{figure}[htbp!]
+        \includegraphics[width=1\linewidth]{Screenshot 2024-09-26 at 19.28.05.png}
+        \caption{}
+    \end{figure}
+    \newline
+\end{example}
+
+\begin{definition}
+    Graph $X$ with vertex set $V$, edge multiset $E$. A spanning subgraph $X'$ of $X$ is a graph with vertex set $V$ and edge set $E'$, where $E' \subset E$.
+\end{definition}
+\begin{remark}
+    Spanning refer to the fact that $X'$ uses every vertex of $X$. Strangely, $X'$ defined in this way must be a simple graph. Also, it's possible that $X$ is connected while $X'$ is not. \newline
+\end{remark}
+
+
+\begin{lemma}
+    Suppose $X$ is a spanning subgraph of a finite graph $Y$. Then $\diam{X}\ge \diam{Y}$.
+\end{lemma}
+\begin{myproof}
+    Some walk in $Y$ may not exist in $X$, but any walk in $X$ must exist in $Y$. So the distance between two vertices in $X$ is no shorter than that in $Y$. \newline
+\end{myproof}
+
+
+\begin{lemma}
+    Finite graphs $X,Y$. Then $\diam{C(X\times Y)} \ge \diam{X}$, and $\diam{C(X\times Y)} \ge \diam{Y}$
+\end{lemma}
+\begin{myproof}
+    Let $x_{1}, x_{2} \in X, \; y_{1}, y_{2} \in Y $. A walk of length $l$ in $C(X \times Y)$ from $(x_{1}, y_{1}) $ to $(x_{2}, y_{2}) $ corresponds to a walk of length $l$ in $X$ from $x_{1} $ to $x_{2} $. So distance in $C(X \times Y)$ is no more than that in $X$. \newline 
+\end{myproof}
+
+
+\begin{lemma}
+    Finite group $G$, $H \le G$, $T$ is the set of transversals, $\Gamma$\syin$G$. Then $\Cay{G,\Gamma}$ is isomorphic to a spanning subgraph of $C(\Cay{H,\hat{\Gamma}} \times \Cos{H\backslash G, \Gamma })$.
+\end{lemma}
+\begin{myproof}
+    First, we identify vertices. 
+    \begin{itemize}
+        \item Define $\phi : \, G \rightarrow H \times (H\backslash G) $, by $\phi(g) = (g(\overline{g})^{-1}, Hg) $
+        \item For $(h, Ha)$, we can find $\phi(h\overline{a}) = (h, Ha)$. Surjectivity done.
+        \item Suppose $ (g_{1}(\overline{g_{1}})^{-1}, Hg_{1}) = (g_{2}(\overline{g_{2}})^{-1}, Hg_{2})  $, then $Hg_{1} = Hg_{2} $, then $\overline{g_{1}} = \overline{g_{2}}$. Since $g_{1}(\overline{g_{1}})^{-1} = g_{2}(\overline{g_{2}})^{-1}$, thus $g_{1} = g_{2} $. Injectivity done.
+    \end{itemize}
+    Then, we identity edges. Note this is just isomorphic to one spanning subgraph, so we only need to show injectivity.
+    \begin{itemize}
+        \item $\gamma \in \Gamma, g\in G$. Then $\gamma$ induces an edge in $\Cay{G,\Gamma}$ from $g$ to $g\gamma$. The corresponding edge in $C(\Cay{H,\hat{\Gamma}} \times \Cos{H\backslash G, \Gamma })$ comes from the edge pair $(e_{1}, e_{2})$. 
+        \item Suppose we have two equal edge pairs $(e_{1}, e_{2})$ and $(e'_{1}, e'_{2})$, then $e_{1}, e'_{1} $ must be induced from same vertex, $e_{2}, e'_{2} $ must be induced from same vertex, and by arguments in matching vertices, we know the corresponding edges in $\Cay{G,\Gamma}$ must be induced from same vertex, so these two edges are the same. Injectivity done.
+        \item[] 
+    \end{itemize}
+\end{myproof}
+
+
+\begin{proposition}
+    Let $G,H,\Gamma,T$ be defined as above. Then 
+    \begin{align*}
+        \diam{\Cay{G,\Gamma}} &\ge \diam{\Cay{H,\hat{\Gamma}}} \\
+        \diam{\Cay{G,\Gamma}} &\ge \diam{\Cos{H\backslash G, \Gamma}}
+    \end{align*}
+\end{proposition}
+\begin{myproof}
+    $\Cay{G,\Gamma}$ - some spanning subgraph of $C(\Cay{H,\hat{\Gamma}} \times \Cos{H\backslash G, \Gamma })$.\newline
+\end{myproof}
+
+
+\begin{proposition}
+    $\{G_{n}\} $ a sequence of finite groups. Suppose $\{G_{n}\} $ admits $\{H_{n}\} $ as a bounded-index sequence of subgroups. If $\{H_{n}\} $ does not have logarithmic diameter, so does $\{G_{n}\} $. Therefore, $\{G_{n}\} $ would not yield an expander family.
+\end{proposition}
+\begin{remark}
+    The Quotient Version is false. It is possible that while quotients do not have logarithmic diameter, the originals have. An example is given in section 7.
+\end{remark}
+\begin{myproof}
+    \begin{itemize}
+        \item[]
+        \item Suppose $\{\Cay{G_{n}, \Gamma_{n}} \} $ has logarithmic diameter for some sets $\Gamma_{n} $, s.t. $\abs{\Gamma_{n}}$ constant and $\Gamma_{n} $\syin$G_{n} $ for all $n$. Let $T_{n} $ be a set of transversals for $H_{n} $ in $G_{n} $. 
+        \item Let $M$ s.t. $[G_{n}:H_{n}]\le M $ for all $n$. Let $$
+        \Lambda_{n} = \hat{\Gamma_{n}} \cup \{(M-[G_{n}:H_{n}])\abs{\Gamma_{n}}\cdot e_{n}\}
+        $$
+        \item Following similar argument in Prop.2.24 and by Prop.4.19, we have 
+        \begin{align*}
+            \diam{\Cay{H_{n},\Lambda_{n}}} &= \diam{\Cay{H_{n},\hat{\Gamma_{n}}}} \\
+            &\le \diam{\Cay{G_{n},\Gamma_{n}}} \\
+            &\le C\ln\abs{G_{n}} \;\;\; \textrm{(Lemma 4.3)} \\
+            &\le C\ln\abs{H_{n}} + C\ln M \;\;\; (\abs{G_{n}} = \abs{H_{n}}[G_{n}:H_{n}]) \\
+            &\le 2C'\ln\abs{H_{n}} \;\;\; (C\ln M \, \textrm{must be bounded})
+        \end{align*}
+        So $\{H_{n}\} $ has logarithmic diameter now, contradiction.
+        \item[] 
+    \end{itemize}
+\end{myproof}
+
+
+\begin{lemma}
+    Dihedral groups $D_{n} $ do not have logarithmic diameter. 
+\end{lemma}
+\begin{myproof}
+    Let $H_{n} = \inner{r} \cong \Z_{n} $, thus $\{H_{n}\} $ do not have logarithmic diameter by Prop.4.13. Note $[D_{n}:H_{n}] =2 $ for all $n$, so by Prop.4.20, $D_{n} $ do not have logarithmic diameter. \newline
+\end{myproof}
+
+
+\section{Solvable Groups with Bounded Derived Length}
+\begin{definition}
+    Group $G$. An element of the form $a^{-1}b^{-1}ab $ for some $a,b\in G$ is a \define{commutator}. Define $G'$ to be the subgroup of $G$ generated by the set of all commutators in $G$. $G'$ is the \define{commutator subgroup} of $G$. \newline
+\end{definition}
+
+
+\begin{definition}
+    Group $G$. We recursively define a sequence of subgroups of $G$, as follows: 
+    \begin{align*}
+        G^{(0)} &= G, \\
+        G^{(1)} &= G', \\
+        &\dots \\
+        G^{(k+1)} &= (G^{k})'
+    \end{align*}
+    The group $G^{(k)} $ is the \define{kth derived subgroup} of $G$.
+\end{definition}
+\begin{remark}
+    That is, each recursion is taking a commutator subgroup, and the 1st derived subgroup of $G$ is exactly the commutator subgroup of $G$. \newline
+\end{remark}
+
+
+\begin{definition}
+    Group $G$. $G$ is solvable with derived length 0 if $G$ is the trivial group. $G$ is solvable with derived length $k+1$ if $G^{k} $ is nontrivial but $G^{k+1} $ is trivial.
+\end{definition}
+\begin{remark}
+\begin{itemize}
+    \item[]
+    \item $G$ is abelian iff $G$ is solvable with derived length 1. In this case, the only commutator is the identity.
+    \item To say a finite group is solvable means it is "built up out of abelian pieces". The derived length is the minimum number of pieces required.
+    \item[] 
+\end{itemize}
+\end{remark}
+
+\begin{lemma}
+    Group $G$. Then:
+    \begin{itemize}
+        \item[1] $G' \triangleleft G $
+        \item[2] If $N$ is a normal subgroup of $G$, then $G/N$ is abelian iff $G'\le N$. That is, $G'$ is the smallest normal subgroup with associated quotient being abelian.
+    \end{itemize}
+\end{lemma}
+\begin{myproof}
+    \begin{itemize}
+        \item[]
+        \item[1] For arbitrary $h \in G'$, $h=a^{-1}b^{-1}ab $ for $a,b\in G$. Then for any $g \in G$, $g^{-1}hg = (g^{-1}a^{-1}b^{-1})(abg) \in G' $, done.
+        \item[2] 
+        \begin{itemize}
+            \item[$(\Rightarrow)$]
+            \begin{align*}
+                 G/N \; \textrm{abelian}
+                &\Leftrightarrow abN = baN, \, \forall a,b\in G \\
+                &\Leftrightarrow a^{-1}b^{-1}ab \in N \, \forall a,b\in G \\
+                &\Rightarrow G' \subset N
+            \end{align*}
+            \item[$(\Leftarrow)$]
+            \begin{align*}
+                 G'\le N 
+                &\Rightarrow G' \subset N \\
+                &\Rightarrow a^{-1}b^{-1}ab \in N \, \forall a,b\in G \\
+                &\Leftrightarrow G/N \; \textrm{abelian}
+            \end{align*}
+            \item[] 
+        \end{itemize} 
+    \end{itemize}
+\end{myproof}
+
+
+\begin{proposition}
+    $\{G_{n}\} $ is a sequence of finite nontrivial groups s.t. $\abs{G_{n}}\rightarrow \infty $. Let $k$ be a positive integer. Suppose that for all $n$, $G_{n} $ is solvable with derived length $\le k$, then $\{G_{n}\} $ does not yield an expander family.
+\end{proposition}
+\begin{myproof}
+    Proof by induction. $k=1$ abelian group, obvious. Suppose true for $k$, consider $k+1$.
+    \begin{itemize}
+        \item[\textbf{Case 1}] The sequence $\{G'_{n}\} $ has bounded index in $\{G_{n}\} $. 
+        \begin{itemize}
+            \item Note $G'_{n} $ does not yield an expander family by induction hypothesis. 
+            \item Also note bounded index. Then by Subgroup Nonexpansion Principle, done. 
+        \end{itemize}
+        \item[\textbf{Case 2}] The sequence $\abs{G_{n}/G'_{n}}$ is unbounded (i.e. index unbounded).
+        \begin{itemize}
+            \item By Lemma 4.25, $G_{n}/G'_{n} $ always abelian, so it does not yield an expander family. 
+            \item This is an unbounded sequence of quotients. Then by Quotients Nonexpansion Principle, done.
+        \end{itemize}
+        \item[] 
+    \end{itemize}
+\end{myproof}
+
+
+\section{Semidirect Product \& Wreath Product}
+Wreath product is a special case of the semidirect product, and is essential in the construction of expander families. \newline
+
+
+\begin{definition}
+    Groups $G,K$. Homomorphism $\theta: \, K \rightarrow \Aut{G} $. Define a binary operation $\star$ on $G\times K$ by $$
+    (g_{1}, k_{1}) \star (g_{2}, k_{2}) = (g_{1}\theta_{k_1}(g_{2}), k_{1}k_{2})
+    $$
+    The set $G\times K$ together with $\star$, is called the semidirect product group of $G$ and $K$ with respect to $\theta$, and is denoted as $G\rtimes K$ when the context of $\theta$ is unambiguous. 
+\end{definition}
+\begin{remark}
+    \begin{itemize}
+        \item[]
+        \item Structure of this construction: $$
+        \begin{array}{cc}
+            \begin{array}{rcl}
+                \theta: \, K  & \rightarrow & \Aut{G} \\
+                k & \mapsto & \theta_{k}
+            \end{array} & \begin{array}{c}
+                \textrm{Special Case:} \\
+                 e_{K} \mapsto id
+            \end{array}  \\
+            & \\
+             \begin{array}{rcl}
+                \theta_{k} : \, G &\rightarrow & G \\
+                g &\mapsto & \theta_{k}(g)
+            \end{array} & \begin{array}{rcl}
+                id: G &\rightarrow & G \\
+                g &\mapsto & g
+            \end{array}
+        \end{array}
+        $$
+        \item Identity: $(e_{G}, e_{K}) $
+        \item Inverse of $(g,k)$: $(\theta^{-1}_{k}(g^{-1}), k^{-1}) $
+        \item Further simplification on notation: $$
+        \begin{array}{rcl}
+            gk & \textrm{for} & (g, k) \\
+            g_{1}k_{1}g_{2}k_{2} & \textrm{for} & (g_{1},k_{1})\star(g_{2},k_{2}) \\
+            \leftindex^k {g} & \textrm{for} & \theta_{k}(g) \\
+        \end{array}
+        $$
+        Note $\leftindex^{{k_{1}}k_{{2}}} {g} = \leftindex^{k_{1}} {(\leftindex^{k_{2}} {g})} $, due to homomorphism of $\theta$
+        \item When there is no ambigurity, we view $G$ as a subgroup of $G\rtimes K$ by identifying $g\in G$ as $(g,e{G})$. Justification: for any group $G$, we always have $G \cong G \times \{e_{G}\}$. Similarly, view $K$ as a subgroup of $G \rtimes K$ by identifying $k\in K$ as $(e_{K}, k) $. 
+        \item In this book's context, we are implicitly treating $G$ and $K$ as subgroups of a larger group, so $e_{K} = e_{G} = 1 $.
+        \item[] 
+    \end{itemize}
+\end{remark}
+
+
+\begin{lemma}
+    $G \triangleleft G\rtimes K $, and $(G \rtimes K)/G \approx K $.
+\end{lemma}
+\begin{remark}
+    Complete notation: $G \times \{e_{G}\} \triangleleft G\rtimes K $, and $(G \rtimes K)/G \cong K \times \{e_{K}\} $ \newline \textcolor{red}{Caution:} These results built on treating $e_{K} = e_{G} = 1 $, i.e. $G$ and $K$ are subgroups of a larger group.
+\end{remark}
+\begin{myproof}
+    \begin{itemize}
+        \item[]
+        \item[1] For arbitrary $(t,1)$ in $G$, for any $(g,k) \in G\rtimes K $, 
+        \begin{align*}
+            (g,k)\star(t,1)\star((g,k))^{-1} &= (g\theta_{k}(t), k)(\theta^{-1}_{k}(g^{-1}),k^{-1}) \\
+            &= (g\theta_{k}(t)g^{-1},1) \in G   
+        \end{align*}
+        Normality done.
+        \item[2] LHS is the left coset of $G$ in $G \rtimes K$, $gkG=\{(g\theta_{k}(t),k) \, \vert \, t\in G\}$. Note $\theta_{k} $ is an automorphism of $G$ (isomorphism from $G$ to $G$), thus for arbitrary $g_{1}, g_{2} \in G $, $g_{1}kG = g_{2}kG $. That is, $gkG$ is determined by $k$ solely. The isomorphism is obvious.
+        \item[] 
+    \end{itemize}
+\end{myproof}
+
+
+\begin{definition}
+\begin{itemize}
+    \item[] 
+    \item Let $I$ be a finite (index) set, and $G,K$ be groups. Let $G^{I} = \oplus_{i\in I}G $ be the direct product of several copies of $G$, one for each element of $I$. Elements of $G$ are $\abs{I}$-tuples $(g_{i})_{i\in I} $, where $g_{i} \in G $ for all $i$. 
+    \item Let $\theta$ be a homomorphism from $K$ to $S^{I} $, where $S^{I} $ is the symmetric group on $I$ (set of all permutations of $I$). Later, call this as "defining $\theta$ as an action of $K$ on $I$".
+    \item Then $\theta$ induces a homomorphism, denoted as $\theta: \, K \rightarrow \Aut{G^{I}} $, by $k \mapsto \theta_{k} $, where $\theta_{k}$ is the permutation in $S^{I} $ which corresponds to $k$.
+    \item[] 
+\end{itemize}
+\end{definition}
+
+
+\begin{definition}
+    The wreath product of $G$ and $K$ with respect to $\theta$ and $I$ is denoted $G\wr K$ and defined as $$G\wr K = G^{I}\rtimes K $$
+\end{definition}
+\begin{remark}
+    \begin{itemize}
+        \item[]
+        \item Wreath product is a special case of semidirect product, thus preserving all its properties. That is, $G\wr K$ is the wreath product group, $G^{I} \triangleleft G\wr K$, and $(G\wr K)/G^{I} \approx K$.
+        \item Structure of this construction:
+        $$
+        \begin{array}{cc}
+            \begin{array}{rcl}
+                \theta: \, K  & \rightarrow & \Aut{G} \\
+                k & \mapsto & \theta_{k}
+            \end{array} & \begin{array}{c}
+                \textrm{Special Case:} \\
+                 e_{K} \mapsto id \, (\textrm{no permutation})
+            \end{array}  \\
+            & \\
+             \begin{array}{rcl}
+                \theta_{k} : \, G^{I} &\rightarrow & G^{I} \\
+                (g_{i})_{i\in I} &\mapsto & (g_{\theta_k (i)})_{i\in I}
+            \end{array} & \begin{array}{rcl}
+                id: G &\rightarrow & G \\
+                (g_{i})_{i\in I} &\mapsto & (g_{i})_{i\in I}
+            \end{array}
+        \end{array}
+        $$
+        Note every $\theta_{k}$ is now a permutation on $I$.
+        \item Binary operation: $((g^{1}_{i})_{i\in I},x) \star ((g^{2}_{i})_{i\in I},y) = ((g^{1}_{i})_{i\in I}(g^{2}_{\theta_x (i)})_{i\in I},xy)  $
+        \item Identity: $((e_{G_i})_{i\in I}, e_{K})$
+        \item Inverse of $((g_{i})_{i\in I}, k) $: $((g^{-1}_{\theta^{-1}_k (i)})_{i\in I}, k^{-1}) $, s.t. 
+        \begin{align*}
+            ((g_{i})_{i\in I}, k) \star ((g^{-1}_{\theta^{-1}_k (i)})_{i\in I}, k^{-1}) &= ((g_{i})_{i\in I}(g^{-1}_{\theta_k\theta^{-1}_k (i)})_{i\in I}, e_{K}) \\
+            &= ((g_{i})_{i\in I}(g^{-1}_{i})_{i\in I}, e_{K}) \\
+            &= ((e_{G_i})_{i\in I}, e_{K})
+        \end{align*}
+        \item[] 
+    \end{itemize}
+\end{remark}
+
+
+\section{Counterexample: Cube-Connected Cycle Graphs}
+This counterexample is motivated by following questions: 
+\begin{itemize}
+    \item[1] Is there a diameter version for Quotients Nonexpansion Principle?
+    \item[2] If a sequence of finite groups has logarithmic diameter, does it necessarily yield an expander family?
+    \item[3] Can an unbounded sequence of solvable groups with bounded derived length have logarithmic diameter? (a more concerete question based on 2)
+\end{itemize}
+The answers are no, no, and yes. The family of cube-connected cycle graphs would be the example. \newline
+
+We make following conventions on notation. Consider positive integer $n$.
+\begin{itemize}
+    \item $e_{i} $ denote the element of $\Z^{n}_{2} = \Z_{2} \times \cdots \times \Z_{2} $, wiht 1 in $i$th place and 0 elsewhere. 
+    \item $0 = (0, \cdots, 0) $ denotes the identity of $\Z^{n}_{2} $
+    \item[] 
+\end{itemize}
+
+
+\begin{definition}
+\begin{itemize}
+    \item[]
+    \item Define an action $\theta$ of $\Z_{n} $ on $I = \Z_{n} $ by $\theta_{a}(b) = a+b $. Via this action, construct the wreath product group $G_{n} = \Z_{2} \wr \Z_{n} $
+    \item Let $\Gamma_{n} = \{(e_{n},0),\gamma,\gamma^{-1}\} \subset G_{n} $, where $\gamma =(0,1), \, \gamma^{-1}=(0,-1) $.
+    \item Define the cube-connected cycle graph $CCC_{n} $ be the Cayley graph $\Cay{G_{n}, \Gamma_{n}}$.
+\end{itemize}
+\end{definition}
+\begin{remark}
+\begin{itemize}
+    \item[]
+    \item $G_{n} = \Z^{n}_{2}\rtimes Z_{n} $, the action of $\Z_{n} $ on $\Z^{2}_{n} $ is given by 
+    \begin{align*}
+        \leftindex^{1} (a_{1},a_{2},\dots,a_{n}) &= (a_{n},a_{1},\dots,a_{n-1}) \\
+        \leftindex^{k} (a_{1},a_{2},\dots,a_{n}) &= (a_{n-k+1},a_{n-k+2},\dots,a_{n-k})
+    \end{align*}
+    Since 1 is the generator of $\Z_{n} $. Note the identity is 0.
+    \item Structure of this construction:
+            $$
+        \begin{array}{cc}
+            \begin{array}{rcl}
+                \theta: \, \Z_{n}  & \rightarrow & \Aut{\Z^{\Z_{n}} } \\
+                a & \mapsto & \theta_{a}
+            \end{array} & \begin{array}{c}
+                \textrm{Special Case:} \\
+                 0 \mapsto id \, (\textrm{no permutation})
+            \end{array}  \\
+            & \\
+             \begin{array}{rcl}
+                \theta_{a} : \, \Z_{n}^{\Z_{n}} &\rightarrow & \Z_{n}^{\Z_{n}} \\
+                (g_{i})_{i\in \Z_{n}} &\mapsto & (g_{i+n-a})_{i\in \Z_{n} }
+            \end{array} & \begin{array}{rcl}
+                id: \Z_{n}^{\Z_{n}} &\rightarrow & \Z_{n}^{\Z_{n}} \\
+                (g_{i})_{i\in \Z_{n}} &\mapsto & (g_{i})_{i\in \Z_{n}}
+            \end{array}
+        \end{array}
+        $$
+    \item Note $\Gamma_{n} $ is symmetric, thus $CCC_{n} $ is undirected. Also, $\abs{\Gamma}=3$, so $CCC_{n} $ is 3-regular.
+    \item[] 
+\end{itemize}
+\end{remark}
+
+
+\begin{example}
+    Let $n=3$. For simplification, denote elements of $\Z^{3}_{2} $ as binary strings (and follow this convention later). Then, $(e_{3},0) = (001,0); \; \gamma = (000,1); \; \gamma^{-1} = (000,-1) $. \newline
+    Consider (100,1). Then 
+    $$
+    \begin{array}{rcccl}
+        (100,1)(000,1) &=& (100+000,1+1) &=& (100,2) \\
+        (100,1)(000,-1) &=& (100+000,1-1) &=& (100,0) \\
+        (100,1)(001,0) &=& (100+100,1+0) &=& (000,1) \\
+    \end{array}
+    $$
+    Hence (100,1) is adjacent to (100,2),(100,0), and (000,1) in $CCC_{3} $.
+\end{example}
+\begin{remark}
+    We express elements of $\Z^{n}_{2} $ as strings of $n$ binary digits. An $n$-dimensional hypercube is the graph whose vertices are the elements of $\Z_{2}^{n} $, where two vertices are adjacent, via an edge of multiplicity one, if they differ in exactly one digit, and they are nonadjacent otherwise. \newline
+    
+    It turns out that $CCC_{n} $ can be visualised as a $n$-dimensional hypercube, where each vertex is replaced by an $n$-cycle composed of elements of $\Z_{n}$ See Figure 4.2. No proof for this visualisation, since it is not the purpose.
+\end{remark}
+
+\begin{figure}[htbp!]
+    \includegraphics[width=1\linewidth]{Screenshot 2024-09-27 at 21.13.08.png}
+    \caption{$CCC_{3} $}
+\end{figure}
+
+
+\begin{proposition}
+    For all $n$, $\diam{CCC_{n}}\le 4n$.
+\end{proposition}
+\begin{myproof}
+    \begin{itemize}
+        \item[]
+        \item An arbitrary element of $G_{n} $ is of the form $(e_{j_1}e_{j_2}\cdots e_{j_k},a)$ for some positive integers $j_{1},\dots,j_{k} $ with $1\le j_{1} < j_{2} < \cdots < j_{k} \le n $ and $k\le n$ (i.e. n bites, either 1 or 0). 
+        \item By Prop.4.10, suffice to show the word norm of $(e_{j_1}e_{j_2}\cdots e_{j_k},a) \le 4n $. 
+        \item Let $e=(e_{n},0) $. Note for all positive integers $c$, 
+        \begin{align*}
+        \gamma^{c}e(\gamma^{-1})^{c} &= (0,c)(e_{n},0)(0,-c) \\
+        &= (0+\leftindex^{c} e_{n}, c+0)(0,-c) \\
+        &= (\leftindex^{c} e_{n}, c)(0,-c) \\
+        &= (\leftindex^{c} e_{n}, 0) \; \; \; \textrm{0 always mapped to identity 0} \\
+        &= (e_{c},0)
+        \end{align*}
+        \item Also note, $(g_{1},0)(g_{2},0) = (g_{1}+\theta_{0}(g_{2}),0) = (g_{1}+g_{2},0)  $, since 0 is the identity.
+        \item Then 
+        \begin{align*}
+        (e_{j_1}e_{j_2}\cdots e_{j_k},a) 
+        &= (e_{j_1},0)(e_{j_2},0)\dots(e_{j_k},0)(0,a) \\
+        &= \gamma^{j_{1}}e\gamma^{-j_{1}}\gamma^{j_{2}}e\gamma^{-j_{2}}\dots\gamma^{j_{k}}e\gamma^{-j_{k}}\gamma^{a} \\
+        &= \gamma^{j_{1}}e\gamma^{j_{2}-j_{1}}e\gamma^{j_{3} -j_{2}}\dots\gamma^{j_{k}-j_{k-1}}e(\gamma^{-1})^{j_{k}}\gamma^{a} \\
+        \end{align*}
+        Note $\gamma$ appears $j_{1} + (j_{2}-j_{1})+\dots + (j_{k}-j_{k-1})+a = j_{k}+a $ times, $\gamma^{-1}$ appears $j_{k} $ times, and $e$ appears $k$ times. So the word norm of $(e_{j_1}e_{j_2}\cdots e_{j_k},a)$ has $2j_{k} + a + k \le 4n $
+        \item[] 
+    \end{itemize}
+\end{myproof}
+
+
+\begin{lemma}
+    The sequence $\{CCC_{n}\} $ has logarithmic diamter. 
+\end{lemma}
+\begin{myproof}
+    $\abs{G_{n}}=\abs{\Z^{n}_{2}}\abs{\Z_{n}}=n2^{n} $, thus $\abs{CCC_{n}}=\ln n+n\ln 2$. Let $C=4/\ln 2$, by Prop.4.4, $$
+    \diam{CCC_{n}} \le 4n \le C(\ln n+n\ln 2) = C\ln\abs{CCC_{n}} 
+    $$ 
+    \begin{itemize}
+        \item[] 
+    \end{itemize}
+\end{myproof}
+
+
+\begin{lemma}
+    $G_{n} $ is solvable with derived length 2. Therefore, the sequence $\{CCC_{n} \} $ is not an expander family. 
+\end{lemma}
+\begin{myproof}
+    Note $G_{n} $ is not abelian as $\gamma e_{n} \ne e_{n}\gamma $, so $G_{n} $ does not have derived length 1. By Lemma 4.28, $\Z^{n}_{2} \triangleleft G_{n} $, and by Lemma 4.25 $G'_{n} $ is the smallest normal subgroup that is abelian, thus $G'_{n} \le \Z^{n}_{2} $. Since $\Z^{n}_{2} $ is the direct product of $Z_{2} $ (cyclic group of prime order), by fundamental theorem of abelian groups, $\Z^{n}_{2} $ is abelian, so is $G'_{n} $. Then, $G^{(2)}_{n} = 1 $.
+\end{myproof}
+\begin{remark}
+    Now we can answer questions asked in the beginning. 
+    \begin{itemize}
+        \item[1] In the proof above, we note $\Z^{n}_{2} \triangleleft G_{n}  $ and $G_{n}/\Z^{n}_{2} \cong \Z_{n} $, which is a sequence of quotients. Also, as an abelian group, $\Z_{n} $ does not have logarithmic diameter. However, by Lemma 4.33, $G_{n} $ does have logarithmic diameter. 
+        \item[2] By Lemma 4.33 and Lemma 4.34.
+        \item[3] By Lemma 4.33 and Lemma 4.34.
+    \end{itemize}
+\end{remark}
+
+
+
+\end{document}
