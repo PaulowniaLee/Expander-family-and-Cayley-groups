@@ -1,0 +1,562 @@
+\documentclass{book}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{graphicx} % Required for inserting images
+\usepackage{amsmath} % basic math stuff, also aligned environment 
+\usepackage{amsfonts} % defeines blackboard bold fonts for \Z, \R
+\usepackage{tikz} % Drawing environment 
+\usepackage{amsthm} % AMS theorem defining stuff
+\usepackage{amssymb} % good looking empty set
+\usepackage{leftindex} % left superscript
+\usepackage{float} % picture position
+\usepackage{scalerel} % parallel for subscript
+
+% Formating stuff
+\usepackage{hyphenat} % forbid use of hyphen
+%complete elimination of hyphen 
+\righthyphenmin = 100
+\lefthyphenmin = 100
+%取消段前空格
+\setlength{\parindent}{0pt}
+
+% Makes section headings and cross references act like links
+\usepackage[colorlinks,unicode]{hyperref}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Create simple shortcut commands.  Almost everyone who uses LaTeX
+% creates commands like thes.
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\C}{\mathbb{C}}
+
+% this is to highlight words that are being defined and enter.
+\newcommand{\define}[1]{\textbf{#1}}
+
+% Symmetric inclusion symbol 
+\newcommand{\syin}{$\subset$\kern-0.48em\raisebox{.20ex}{\tiny S}$\,$}
+%\kern 左右移动(-为向左)，\raisebox 上下移动(-为向下)
+% Note this symbol does not work in math mode.
+
+% Zig-Zag product symbol 
+\newcommand{\zigzag}{$\bigcirc$\kern-0.77em\raisebox{-.16ex}{\small Z}$\,$}
+%\kern 左右移动(-为向左)，\raisebox 上下移动(-为向下)
+% Note this symbol does not work in math mode.
+
+% diam
+\newcommand{\diam}[1]{\textrm{diam}( #1 )}
+% inner product 
+\newcommand{\inner}[1]{\langle #1 \rangle}
+% norm 
+\newcommand{\norm}[1]{\lVert #1 \rVert}
+% dist
+\newcommand{\dist}[1]{\textrm{dist}( #1 )}
+% absolute value 
+\newcommand{\abs}[1]{\lvert #1 \rvert }
+% Cayley graph 
+\newcommand{\Cay}[1]{\textrm{Cay}( #1 )}
+% Cos graph
+\newcommand{\Cos}[1]{\textrm{Cos}( #1 )}
+% Automorphism group 
+\newcommand{\Aut}[1]{\textrm{Aut}( #1 )}
+% multiplicity of edges
+\newcommand{\mul}[1]{\textrm{mul}( #1 )}
+% trace of matrix
+\newcommand{\tr}[1]{\textrm{tr}( #1 )}
+
+
+
+% 简写section title
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% The next page or two of stuff is devoted to creating and
+% manipulating the environments for lemma, proof, example, etc.
+% The first part is pretty simple, and almost everyone has commands
+% like this in every paper, article, book, etc.  
+% 
+% We start with things like lemmas, theorems, etc.
+
+%注释
+%\newtheorem{env name}{text}[parent counter]
+%\newtheorem{env name}[shared counter]{text}
+%parent counter: numbering will resteart whenever that sectional level is encountered
+%shared counter: if specificed, numbering will progress sequentially for 
+%all theorem element using this counter
+
+\theoremstyle{definition} 
+%adds extra space above and below, but sets the text in roman
+%recommended for definitions, conditions, problems, and examples
+
+\newtheorem{lemma}{Lemma}[chapter]
+\newtheorem{proposition}[lemma]{Proposition}
+\newtheorem{theorem}[lemma]{Theorem}
+\newtheorem{corollary}[lemma]{Corollary}
+\newtheorem{definition}[lemma]{Definition}
+
+%自定义新的theorem environment
+\newtheoremstyle{remarkstyle}
+    {\topsep}%   space above, empty for `usual value'
+    {\topsep}%   space below
+    {}%          body font, input \itshape for italian
+    {}%          indent amount 
+    {}%          thm head font 
+    {}%          Punctuation after thm head
+    {\newline}%  Space after thm head: \newline = linebreak
+    {}%          Thm head spec
+\theoremstyle{remarkstyle}
+\newtheorem*{remark}{Remark}%[chapter] 
+\newtheorem*{example}{Example}%[chapter]
+\newtheorem*{myproof}{Proof}%[chapter]
+%this formating (* and %[chapter]) elminates numbering for theorem environment
+
+%theorem之间的空间是手动调的，在最后加个\newline或者item[]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% The stuff that follows is a bit tricky, and is well more than most
+% people do with LaTeX.  The basic idea is that I want to be able to
+% show only examples, or only definitions, or hide only proofs, etc.  
+
+
+\makeatletter
+% the following key values give the set up for hiding certain
+% environemnts. Note that "true" is just a dummy value.  It would work
+% equally well with "foo".  Each one of these redefines the outer
+% environment for an atom to turn the whole thing into a hidden
+% comment.  Note that the environments theorem, example, etc. do not
+% have to be written in any special way for hide and show to work.
+% They get clobbered by hide.  
+  \define@key{hide}{lemma}[true]{\renewenvironment{lemma}{\comment}{\endcomment}}
+  \define@key{hide}{comments}[true]{\renewenvironment{comments}{\comment}{\endcomment}}
+  \define@key{hide}{corollary}[true]{\renewenvironment{corollary}{\comment}{\endcomment}}
+  \define@key{hide}{definition}[true]{\renewenvironment{definition}{\comment}{\endcomment}}
+  \define@key{hide}{example}[true]{\renewenvironment{example}{\comment}{\endcomment}}
+  \define@key{hide}{proposition}[true]{\renewenvironment{proposition}{\comment}{\endcomment}}
+  \define@key{hide}{theorem}[true]{\renewenvironment{theorem}{\comment}{\endcomment}}
+  \define@key{hide}{remark}[true]{\renewenvironment{remark}{\comment}{\endcomment}}
+  \define@key{hide}{myproof}[true]{\renewenvironment{myproof}{\comment}{\endcomment}}
+% Now this command can be given a comma separated list of names to
+% hide.  Thus, \HideEnvirons{ example, proof} would hide all examples
+% and proofs.
+\newcommand{\HideEnvirons}[1]{\setkeys{hide}{#1}}
+
+
+% The \ShowEnvirons command works like this: if it's argument is foo,
+% it redefines the *hide* family key for foo to do nothing.  Then, it
+% issues a \HideEnvirons command containing a list of all the atom
+% types.  So, everything is hidden *unless* the hide-family key has
+% been redefinied.
+  \define@key{show}{lemma}[true]{\define@key{hide}{lemma}{}}
+  \define@key{show}{comments}[true]{\define@key{hide}{comments}{}}
+  \define@key{show}{corollary}[true]{\define@key{hide}{corollary}{}}
+  \define@key{show}{definition}[true]{\define@key{hide}{definition}{}}
+  \define@key{show}{example}[true]{\define@key{hide}{example}{}}
+  \define@key{show}{proposition}[true]{\define@key{hide}{proposition}{}} 
+  \define@key{show}{theorem}[true]{\define@key{hide}{theorem}{}}
+  \define@key{show}{remark}[true]{\define@key{hide}{remark}{}}
+  \define@key{show}{myproof}[true]{\define@key{hide}{myproof}{}}
+% This command can be given a comma separated list of names to show,
+% and only these will be shown.  Thus,
+% \ShowEnvirons{example,definition} will show only examples and definitions.
+\newcommand{\ShowEnvirons}[1]
+{\setkeys{show}{#1}\HideEnvirons{%
+    comments,
+    corollary,
+    definition,
+    example,
+    proposition,
+    theorem,
+    lemma,
+    remark,
+    myproof
+  }}
+\makeatother
+
+% Comment out the next line to see the full text
+\ShowEnvirons{definition, proposition, theorem, remark, example, lemma, myproof, corollary}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+\setcounter{chapter}{7}
+\chapter{Kazhdan Constant}
+% Tips facing very long chapter titles 
+% \chapter[medium-length title for Table of contents, if wanted]{full title name}
+% \chaptermark{short title for running headers}
+
+
+
+\section{Basics}
+\begin{definition}
+    Finite group $G$, $\Gamma$\syin$G$, $\rho$ a unitary representation of $G$ on representation space $V$ with $G$-invariant inner product $\inner{\cdot,\cdot}$. With nonempty $\Gamma$, define 
+    $$
+    \kappa (G,\Gamma,\rho,\inner{\cdot,\cdot}) = \min_{\norm{v}=1}\;\;\max_{\gamma\in\Gamma}\norm{\rho(\gamma)v-v}
+    $$
+    when $\Gamma$ is empty, define $\kappa$ as 0. Note that we do not require $\Gamma$ to be symmetric or a multiset.
+\end{definition}
+\begin{remark}
+    For $G$-invariant $\inner{\cdot,\cdot}$ w.r.t. $\rho$, we have $\norm{v}=\norm{\rho (g)v}$.
+\end{remark}
+\begin{remark}
+    Each $\norm{\rho(\gamma)v-v}$ is a continuous function of $v$, so the max of these continuous functions is a continuous function. Also, the unit $v$ lies in a compact sphere, hence minimum can be achieved. \newline
+\end{remark}
+
+\begin{proposition}
+    $G,\Gamma,\rho$ as above, let $\inner{\cdot,\cdot}, \inner{\cdot,\cdot}'$ be two $G$-invariant inner products, then 
+    $$
+    \kappa (G,\Gamma,\rho,\inner{\cdot,\cdot}) = \kappa (G,\Gamma,\rho,\inner{\cdot,\cdot}') 
+    $$
+\end{proposition}
+\begin{remark}
+    That is, the quantity $\kappa (G,\Gamma,\rho) = \kappa (G,\Gamma,\rho,\inner{\cdot,\cdot})$ is independent from the choice of inner product. Also, note a $G$-invariant inner product always exists. 
+\end{remark}
+\begin{remark}
+    From remark of Def. 8.1, we know the min is achieved. In fact, for any unitary irrep $\rho$, exists $v\in V,\gamma\in\Gamma$ s.t. $\norm{\rho(\gamma)\cdot v-v}=\kappa(G,\Gamma,\rho)$
+\end{remark}
+\begin{myproof}
+    Using $\inner{\cdot,\cdot}$, we can decompose $V$ (Maschke's theorem)
+    $$
+    V = V_1 \bigoplus \cdots \bigoplus V_n
+    $$
+    We can do the same with $\inner{\cdot,\cdot}'$
+    $$
+    V = V'_1 \bigoplus \cdots \bigoplus V'_m
+    $$
+    But we know such decomposition is essentially unique, so we have $n=m$ and a G-invariant isomorphism $\phi$ s.t. $\phi(V_1)=V_1',\dots, \phi(V_n)=V'_n$. Define inner product $\inner{\cdot,\cdot}''$ on $V$ by 
+    $$
+    \inner{v,w}'' = \inner{\phi(v),\phi(w)}'
+    $$
+    Trivial to see this is indeed an inner product and is $G$-invariant. Note $V = V_1 \bigoplus \cdots \bigoplus V_n$ is also an orthogonal direct sum w.r.t. $\inner{\cdot,\cdot}''$. But by Prop. 6.37, we know invariant inner product is unique, so 
+    $$
+    \inner{v,w}'' = C_i\inner{v,w}
+    $$
+    whenever $v,w\in V_i$, so the map 
+    $$
+    v_1 + \cdots v_n \mapsto \frac{\phi(v_1)}{\sqrt{C_1}} + \cdots \frac{\phi(v_n)}{\sqrt{C_n}}
+    $$
+    defines a bijection from $\{\norm{v}=1\}$ to $\{\norm{v'}=1\}$ (mostly because $\phi$ is an isomorphism, so this is like change of basis). Then
+    \begin{align*}
+        \norm{\rho(\gamma)\cdot \sum^n_{i=1}v_i-\sum^n_{i=1}v_i}^2 
+        &= \sum^n_{i=1}\norm{\rho(\gamma)\cdot v_i - v_i}^2 \\
+        &\textrm{orthogonal, no intersection terms} \\
+        &= \sum^n_{i=1}C^{-1}_i (\norm{\rho(\gamma)\cdot v_i - v_i}'')^2 \\
+        &= \sum^n_{i=1}C^{-1}_i(\norm{\rho(\gamma)\cdot\phi(v_i)-\phi(v_i)}')^2 \\
+        &\textrm{both steps by properties of inner products} \\
+        &= (\norm{\rho(\gamma)\cdot \sum^n_{i=1}\frac{\phi(v_i)}{\sqrt{C_i}} - \sum^n_{i=1}\frac{\phi(v_i)}{\sqrt{C_i}} }')^2
+    \end{align*}
+    By the bijection from $v$ to $v'$, we are done. \newline 
+\end{myproof}
+
+\begin{lemma}
+    If $\phi$ and $\rho$ are equivalent representations, then $\kappa(G,\Gamma,\phi)=\kappa(G,\Gamma,\rho)$
+\end{lemma}
+\begin{myproof}
+    Let $\psi$ be a $G$-isomorphism from $V$ to $W$ (whose existence follows from two representations being equivalent). Let $\inner{\cdot,\cdot}$ be a $G$-invariant on $W$, define 
+    $$
+    \inner{v_1,v_2}'=\inner{\psi(v_1),\psi(v_2)}
+    $$
+    whose invariance follows from $G$-isomorphism $\psi$. Note $\norm{v}'=1$ iff $\norm{\psi(v)}=1$, so 
+    \begin{align*}
+        \kappa(G,\Gamma,\phi) 
+        &= \min_{\norm{v}'=1} \max_{\gamma\in\Gamma}\norm{\phi(\gamma)v-v}' \\
+        &= \min_{\norm{v}'=1} \max_{\gamma\in\Gamma}\norm{\psi(\phi(\gamma)v-v)} \\
+        &= \min_{\norm{v}'=1} \max_{\gamma\in\Gamma}\norm{\rho(\gamma)\psi(v)-\psi(v) } \\
+        &= \min_{\norm{w}=1}\max_{\gamma\in\Gamma}\norm{\rho(\gamma)w-w} = \kappa(G,\Gamma,\rho)
+    \end{align*}
+    The key is to use $\psi$ as a G-invariant isomorphism. \newline 
+\end{myproof}
+
+\begin{definition} 
+    Finite nontrivial group $G$, $\Gamma$\syin$G$, define 
+    $$
+    \kappa(G,\Gamma) = \min_{\rho}\{\kappa(G,\Gamma,\rho)\}
+    $$
+    where the min is over all irreducible, nontrivial, unitary representations of $G$. This quantity is the Kazhdan constant. \newline 
+\end{definition}
+\begin{remark}
+    Recall $G$ has only finitely many irreps up to equivalence. Also, the sum of all nontrivial irreps of $G$ is the orthogonal complement of the trivial one, so nontrivial irreps indeed exist. Hence, this min always exists.
+\end{remark}
+\begin{remark}
+    \begin{itemize}
+        \item[]
+        \item One possible interpretation: given any nontrivial unitary irrep $\rho$ and any unit vector $v$ in the representation space, there exists an element in $\Gamma$ that moves $v$ a distance of at least $\kappa$, and $\kappa$ is the largest number for the preceding statement to be true. 
+        \item Another implication: Let $\rho\;:\;G\rightarrow V$ be unitary irrep, $v\in V$, then exists $\gamma\in\Gamma$ s.t. 
+        $$
+        \norm{\rho(\gamma)v-v}\ge \kappa(G,\Gamma)\norm{v}
+        $$
+        \begin{itemize}
+            \item Make this a unit vector by dividing $\norm{v}$
+            \item Take $\gamma=\arg\max_{\gamma\in\Gamma}\norm{\rho(\gamma)w-w} $. LHS did not take min while RHS did, done.
+        \end{itemize}
+        \item Note 
+        $$
+        \kappa(G,\Gamma) = \min_{\rho}\min_{\norm{v}=1}\max_{\gamma\in\Gamma}\norm{\rho(x)v-v}
+        $$
+        \item[] 
+    \end{itemize}
+\end{remark}
+
+\begin{proposition}
+    Finite nontrivial group $G$, $\Gamma$\syin$G$, then $\kappa(G,\Gamma)\le 2$
+\end{proposition}
+\begin{myproof}
+$$
+\norm{\pi(\gamma)v-v} \le \norm{\pi(v)}+\norm{v} = 1+1 = 2
+$$\newline 
+\end{myproof}
+
+\begin{proposition}
+    Let $\rho\,:\,G\rightarrow GL(V)$ be a unitary representation of a finite nontrivial group $G$, let $\Gamma,\Gamma'\subset G$. Suppose that every element of $\Gamma'$ can be expressed as a word in $\Gamma$ of length less than $n$, then 
+    \begin{itemize}
+        \item $\kappa(G,\Gamma,\rho)\ge \kappa(G,\Gamma',\rho)/n$
+        \item $\kappa(G,\Gamma)\ge \kappa(G,\Gamma')/n$ 
+    \end{itemize}
+\end{proposition}
+\begin{myproof}
+    (2) follows directly from (1). Let $v,\gamma$ be s.t. $\kappa(G,\Gamma,\rho)=\norm{\rho(\gamma)v-v} \equiv \norm{\gamma v-v}$ (for notational simplicity). Let $\gamma'\in\Gamma'$, then $\gamma'=\gamma_1\cdots\gamma_j$. Define $\alpha_k=\gamma_1\cdots\gamma_k$ for $k=1,\dots,j$, then 
+    \begin{align*}
+        \norm{\gamma' v-v} &= \norm{\alpha_jv-v} \\
+        &= \norm{(\alpha_jv-\alpha_{j-1}v) + (\alpha_{j-1}v-\alpha_{j-2}v) + \cdots + (\alpha_2v-\alpha_{1}v) + (\alpha_1v-v)  }  \\
+        &\le \norm{\alpha_{j}v-\alpha_{j-1}v} + \cdots + \norm{\alpha_{1}v-v} \\
+        &= \norm{\gamma_jv-v} + \cdots \norm{\gamma _1v-v} \\
+        &\textrm{G-invariant} \\
+        &\le j\kappa(G,\Gamma,\rho) \\
+        &\le n\kappa(G,\Gamma,\rho) 
+    \end{align*}
+    \newline 
+\end{myproof}
+
+
+
+
+
+\section{Kazhdan Constant, Isoperimetric Constant, and the Spectral Gap}
+Denote right regular representation as $R$, ``the" trivial representation as 1. \newline 
+
+\begin{lemma}
+    Let $G$ be a finite nontrivial group, $\Gamma$\syin$G$, $d=\abs{\Gamma},\kappa=\kappa(G,\Gamma)$
+    \begin{itemize}
+        \item $\rho\,:\,G\rightarrow GL(V)$ be a nontrivial representation (i.e. $\inner{\chi_1,\chi_\rho}=0$, then $\kappa(G,\Gamma,\rho)\ge \frac{\kappa}{\sqrt{d}}$
+        \item Let $\hat{R}$ be the restriction of $R$ to $L^2_0(G)$, $\hat{\kappa}=\kappa(G,\Gamma,\hat{R})$, then $\kappa\ge\hat{\kappa}\ge\frac{\kappa}{\sqrt{d}}$
+    \end{itemize}
+\end{lemma}
+\begin{myproof}
+    For (2), RHS is (1) on some nontrivial irrep (which must be a part of $L^2_0(G)$), done. For LHS, 
+    \newline 
+\end{myproof}
+
+\begin{proposition}
+    Let $G$ be a finite nontrivial group, $\Gamma$\syin$G$, $d=\abs{\Gamma},\kappa=\kappa(G,\Gamma)$, let $h=h(\Cay{G,\Gamma})$, then 
+    $$
+    h \ge \frac{\kappa^2}{4d}
+    $$
+\end{proposition}
+\begin{myproof}
+
+\end{myproof}
+
+\begin{proposition}
+    Let $G$ be a finite nontrivial group, $\Gamma$\syin$G$, $d=\abs{\Gamma},\kappa=\kappa(G,\Gamma)$, let $\lambda_1$ be the second largest eigenvalue, then 
+    $$
+    \kappa \ge \sqrt{\frac{2(d-\lambda_1)}{d}}
+    $$
+\end{proposition}
+\begin{myproof}
+    
+\end{myproof}
+
+\begin{theorem}
+    Let $d$ be a positive integer, let $\{G_n\}$ be a sequence of groups with $\abs{G_n}\rightarrow\infty$. For each $n$, let $\Gamma_n$\syin $G_n$ s.t. $\abs{\Gamma_n}=d$, then $\{\Cay{G_n,\Gamma_n}\}$ is an expander family iff there exists $\epsilon>0$ s.t. $\kappa(G_n,\Gamma_n)\ge\epsilon$ for all $n$.
+\end{theorem}
+\begin{myproof}
+    With Prop.8.8 and Prop.8.9, we get a representation copy of Chapter 1. \newline 
+\end{myproof}
+
+\begin{corollary}
+    Let $G$ be a finite nontrivial group, then $\kappa(G,G)>\sqrt{2}$
+\end{corollary}
+\begin{myproof}
+
+\end{myproof}
+
+
+
+
+
+\section{Abelian Groups Never Yields Expander Families}
+\begin{lemma}
+    Let $\theta$ be a real number, then $\abs{e^{i\theta}-1}\le\abs{\theta}$
+\end{lemma}
+\begin{myproof}
+    By elementary calculus. \newline 
+\end{myproof}
+
+\begin{proposition}
+    Let $G$ be a nontrivial finite abelian group, $\Gamma\subset G$, $d=\abs{\Gamma}$, then 
+    $$
+    \kappa(G,\Gamma)\le \frac{2\pi}{\abs{G}^{1/d}-1}
+    $$
+\end{proposition}
+\begin{remark}
+    We see $\kappa \rightarrow 0$ as $\abs{G}\rightarrow\infty $, so sequence abelian groups cannot yield expander family.
+\end{remark}
+\begin{myproof}
+    First, recall the irreps of finite abelian groups \newline 
+    Suppose $G=\Z_{n_1}\times \cdots \Z_{n_r} $, then the set of irreps of $G$ is
+    $$
+    \{\phi_a\,\lvert\, a = (a_1,\dots,a_r) \in \Z_{n_1}\times \cdots \Z_{n_r}\}
+    $$
+    where 
+    $$
+    \phi_a(k_1,\dots,k_r) = (e^{\frac{2\pi ia_1k_1}{n_1}}\dots e^{\frac{2\pi ia_rk_r}{n_r}})
+    $$
+    Note $\abs{G}=\abs{\Z_{n_1}}\times\cdots\abs{\Z_{n_r}}$, so the size of set of all irreps is the same as $\abs{G}$ \newline 
+
+Let $\kappa = \kappa(G,\Gamma) >0$, $C$ be the smallest integer greater than or equal to $2\pi /\kappa$. Claim $\abs{G}\le C^d$. If we have this, then $\abs{G}^{1/d} \le C\le 2\pi/\kappa +1$, solve for $\kappa$, done. \newline 
+
+Suppose $\abs{G}>C^d$. Let $G=\Z_{n_1}\times \cdots \Z_{n_r}$, $S$ be the set of all irreps. We know that for any irrep $\rho$, for arbitrary $g\in G$, $\rho(g)$ is of the form $e^{i\theta} $ for some $\theta \in [0,2\pi)$. Note the image of $\rho$ will always lie inside $\C^*$ ($\C$ without 0). \newline 
+
+For any element $z$ on the unit circle in $\C$, let $\ell(z)$ be the unique argument angle s.t. $e^{i\theat} = z $. Define $\phi\,:\, S\rightarrow [0,2\pi)^d$ by 
+$$
+\phi(\rho) = [\ell(\rho(\gamma_1)), \dots, \ell(\rho(\gamma_n))]
+$$
+where $\gamma_1,\dots,\gamma_d$ are the elements of $\Gamma$. That is, we take the argument for the mapped results of $\Gamma$ \newline 
+
+Suppose $a_1,\dots,a_d$ are integers with $1\le a_j\le C$ for all $j$, and $a=(a_1,\dots, a_d)$, define 
+$$
+B_a = \left\{ 
+(r_1, \dots, r_d) \in [0,2\pi)^d \;:\; 
+\frac{2\pi(a_j-1)}{C} \le r_j \le \frac{2\pi a_j}{C}
+\right\}
+$$
+That is, we partition the $[0,2\pi)^d$. Note there are $C^d$ choices of $B_a$, and the union of them all indeed partitions $[0,2\pi)^d$. The figure below shows the case for $C=3, d=2$, the x-axis denotes $r_1$, the y-axis denotes $r_2$, and $B_{(1,2)} $ is the case $a_1 = 1, a_2 = 2$. \newline 
+
+We know $\abs{S}=\abs{G}$, by the pigeonhole principle, there must be two distinct irreps $\rho_1,\rho_2$ falling in the same $B_a$ box. That is, we can control their corresponding arguments
+$$
+\omega \equiv \abs{\ell(\rho_1(\gamma_j)) - \ell(\rho_2(\gamma_j)) } < \frac{2\pi}{C}
+$$
+for any $j$. \newline 
+
+Define $\rho\,:\, G\rightarrow GL(1,\C)$ by $\rho(g) = \rho_1(g)/\rho_2(g)$. Straightforward to see this is a homomorphism (hence a representation). Also, $dim(GL(1,\C))=1$ and $\rho_1(g)/\rho_2(g)\neq 1$, so it is a nontrivial irrep. Note $\rho(\gamma_j) = e^{i\omega} $, so by Lemma 8.12, $\abs{\rho(\gamma_j)-1}<2\pi/C$ for all $j$. Note the unit vector in $\C$ is exactly 1, so $\kappa < \kappa(G,\Gamma,\rho) < 2\pi\C$, contradicts with definition of $C$, done. \newline 
+
+\end{myproof}
+
+
+
+
+
+\section{Kazhdan Constant, Subgroups, and Quotients}
+\begin{definition}
+    Groups $G,H$, $\rho\,:\, H\rightarrow GL(V)$ a representation, $\phi\,:\, G\rightarrow H$ a homomorphism. Let $\rho* = \rho \,  \circ \, \phi $, then $\rho^*\,:\, G\rightarrow GL(V)$ is a representation of $G$, called the pullback of $\rho$ via $\phi$ \newline 
+\end{definition}
+
+\begin{lemma}
+    Finite group $G$, $N\vartriangleleft G$, suppose $\rho\,:\, G\rightarrow GL(V)$ is an irrep of $G/N$, let $\phi\,:\, G\rightarrow G/N$ be the canonical homomorphism (i.e. $\phi(g) = gN$), let $\rho^*$ be the pullback of $\rho$ via $\phi$, then $\rho^*$ is an irrep of $G$.
+\end{lemma}
+\begin{myproof}
+    Homomorphism is trivial. Suppose there is a proper nontrivial subspace $W$ of $V$ s.t. $\rho^*(g)w \in W$, then $\rho(\phi(g))w\in W$, thus $\rho(gN)w\in W$, contradicting with irreducibility of $\rho$. Essentially, any subspace invariant under action of $G$ is invariant under the action of $G/N$.
+\end{myproof}
+\begin{remark}
+    If an inner product is $G/N$-invariant under $\rho$, then it is also $G$-invariant under the pullback $\rho^*$. \newline 
+\end{remark}
+
+\begin{proposition}
+    Finite nontrivial group $G$, finite nontrivial $N\vartriangleleft G$, $\Gamma$\syin $G$. Let $\bar{\Gamma}$ be the image of $\Gamma$ under the canonical homomorphism, then 
+    $$
+    \kappa(G,\Gamma) \le \kappa(G/N, \bar{\Gamma})
+    $$
+\end{proposition}
+\begin{myproof}
+    Let $\rho\,:\,G/N\rightarrow GL(V)$ be a nontrivial irrep. Let unit vector $v\in V$, $\gamma_0N\in \bar{\Gamma}$ be s.t. $\norm{\rho(\gamma_0N)v-v}=\kappa(G/N,\bar{\Gamma},\rho)$ (we can do this since the min is achievable). Let $\rho^*$ be the pullback of $\rho$ via the canonical homomorphism, then for any $\gamma\in\Gamma$, 
+    $$
+    \norm{\rho^*(\gamma)v-v} = \norm{\rho(\phi(\gamma))v-v} = \norm{\rho(\gamma N)v-v}
+    $$
+    So 
+    $$
+    \kappa(G,\Gamma) \le \kappa(G,\Gamma,\rho^*) = \kappa(G/N,\bar{\Gamma},\rho)
+    $$
+    this works for any $\rho$ of $G/N$, done. 
+\end{myproof}
+\begin{remark}
+    With Prop. 8.16 and Theorem 8.10, we recover the Quotients Nonexpansion Principle. \newline 
+\end{remark}
+
+\begin{proposition}
+    Let $G$ be a finite nontrivial subgroup, $H$ be a nontrivial subgroup of $G$, $\Gamma$\syin $G$, $d=\abs{\Gamma}, n=[G:H], T=\{t_1,\dots,t_n\}$, where $T$ is the set of transverals for $H$ in $G$. Let $\hat{\Gamma}$ be the set of Schreier generators. Then 
+    $$
+    \kappa(G,\Gamma) \le d^{1/2}\kappa(H,\hat{\Gamma})
+    $$
+\end{proposition}
+\begin{myproof}
+    Recall some useful facts:
+    \begin{itemize}
+        \item $g\in G$, $g = h\overline{g}$
+        \item $\widehat{(t,\gamma)} = t\gamma(\overline{t\gamma})^{-1} $
+        \item Any $g\in G$, $g=ht$ for some unique $h\in H, t\in T $, and $t\gamma = \widehat{(t,\gamma)}\overline{t\gamma} $
+    \end{itemize}
+\end{myproof}
+
+Let $\sigma\,:\,H\rightarrow GL(W)$ be a nontrivial irrep of $H$, $\inner{\cdot,\cdot}$ be an $H$-invariant innner product on $W$, $w$ be the unit vector in $W$ s.t. 
+$$
+\kappa(H,\hat{\Gamma}) = \max_{\widehat{(t,\gamma)}\in\hat{\Gamma}} \norm{\sigma(\widehat{(t,\gamma)})w -w}_W
+$$
+Let $\rho=Ind^G_H(\sigma)$ be the induced representation, $V=\{f\,:\, G\rightarrow W \,\lvert\, f(hg) = \sigma(h)f(g), \forall g\in G, h\in H\} $. \newline 
+
+For all $h\in H, t\in T$, define 
+$$
+f(ht) = n^{-1/2}\sigma(h)w
+$$
+Note $f(h'g) = f(h'h''t) = f(ht) = n^{-1/2}\sigma(h)w  $ and $\sigma(h')f(g) = \sigma(h')f(h''t) = \sigma(h'h'')n^{-1/2}w $, so indeed $f\in V$. Also, $f(t) = n^{-1/2}w$. \newline 
+
+Follow the inner product 
+$$
+\inner{y_1, y_2}_V = \sum^{n}_j\inner{y_1(t_1), y_2(t_1)}_W
+$$
+we have 
+$$
+\norm{f}^2_V = \sum^n_{j=1}\inner{n^{-1/2}w, n^{-1/2}w}_W = \sum^n_{j=1}n^{-1}\norm{w}^2_W = 1
+$$
+so $f$ is a unit vector in $V$, which can be used to get bounds for $\kappa$ \newline 
+
+Let $\gamma\in \Gamma$, 
+\begin{align*}
+    \norm{\rho(\gamma)f - f}^2_V 
+    &= \sum^n_{j=1}\norm{f(t_j\gamma)-f(t_j)}^2_W \\
+    &\textrm{the definition of Ind, $\rho(x)f(g) = f(gx)$} \\
+    &= \sum^n_{j=1} \norm{f(\widehat{(t_j,\gamma)}\overline{t_j\gamma}) - f(t_j) }^2_W \\
+    &= \sum^n_{j=1} \norm{\sigma\left(\widehat{(t_j,\gamma)}\right) f(\overline{t_j\gamma}) - f(t_j) }^2_W \\
+    &= \sum^n_{j=1} \norm{\sigma\left(\widehat{(t_j,\gamma)}\right) (n^{-1/2}w) - n^{-1/2}w }^2_W \\
+    &= \frac{1}{n} \sum^n_{j=1} \norm{\sigma\left(\widehat{(t_j,\gamma)}\right) w - w }^2_W
+\end{align*}
+Then for some $j$ (i.e. the max of all these terms)
+$$
+\norm{\rho(\gamma)f - f}^2_V \le \norm{\sigma\left(\widehat{(t_j,\gamma)}\right) w - w }^2_W
+$$
+So 
+$$
+\norm{\rho(\gamma)f - f}_V \le \kappa(H,\hat{\Gamma})
+$$
+Since $\gamma$ is arbitrary, we have $\kappa(G,\Gamma,\rho)\le \kappa(H,\hat{\Gamma})$. Also, we know from the last example of Chapter 6, $\rho$ cannot contain the trivial representation, so by Lemma 8.7, $\kappa(G,\Gamma)/d^{1/2} \le \kappa(G,\Gamma,\rho) \le \kappa(H,\hat{\Gamma})  $, done. 
+\end{myproof}
+\begin{remark}
+    With Prop. 8.17 and Theorem 8.10, we recover the Subgroups Nonexpansion Principle.
+\end{remark}
+
+
+
+
+
+
+
+
+
+
+
+
+
+\end{document}
