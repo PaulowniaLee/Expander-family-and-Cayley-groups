@@ -1,0 +1,1260 @@
+\documentclass{book}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{graphicx} % Required for inserting images
+\usepackage{amsmath} % basic math stuff, also aligned environment 
+\usepackage{amsfonts} % defeines blackboard bold fonts for \Z, \R
+\usepackage{tikz} % Drawing environment 
+\usepackage{amsthm} % AMS theorem defining stuff
+\usepackage{amssymb} % good looking empty set
+\usepackage{leftindex} % left superscript
+\usepackage{float} % picture position
+\usepackage{scalerel} % parallel for subscript
+
+% Formating stuff
+\usepackage{hyphenat} % forbid use of hyphen
+%complete elimination of hyphen 
+\righthyphenmin = 100
+\lefthyphenmin = 100
+%取消段前空格
+\setlength{\parindent}{0pt}
+
+% Makes section headings and cross references act like links
+\usepackage[colorlinks,unicode]{hyperref}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Create simple shortcut commands.  Almost everyone who uses LaTeX
+% creates commands like thes.
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\C}{\mathbb{C}}
+
+% this is to highlight words that are being defined and enter.
+\newcommand{\define}[1]{\textbf{#1}}
+
+% Symmetric inclusion symbol 
+\newcommand{\syin}{$\subset$\kern-0.48em\raisebox{.20ex}{\tiny S}$\,$}
+%\kern 左右移动(-为向左)，\raisebox 上下移动(-为向下)
+% Note this symbol does not work in math mode.
+
+% Zig-Zag product symbol 
+\newcommand{\zigzag}{$\bigcirc$\kern-0.77em\raisebox{-.16ex}{\small Z}$\,$}
+%\kern 左右移动(-为向左)，\raisebox 上下移动(-为向下)
+% Note this symbol does not work in math mode.
+
+% diam
+\newcommand{\diam}[1]{\textrm{diam}( #1 )}
+% inner product 
+\newcommand{\inner}[1]{\langle #1 \rangle}
+% norm 
+\newcommand{\norm}[1]{\lVert #1 \rVert}
+% dist
+\newcommand{\dist}[1]{\textrm{dist}( #1 )}
+% absolute value 
+\newcommand{\abs}[1]{\lvert #1 \rvert }
+% Cayley graph 
+\newcommand{\Cay}[1]{\textrm{Cay}( #1 )}
+% Cos graph
+\newcommand{\Cos}[1]{\textrm{Cos}( #1 )}
+% Automorphism group 
+\newcommand{\Aut}[1]{\textrm{Aut}( #1 )}
+% multiplicity of edges
+\newcommand{\mul}[1]{\textrm{mul}( #1 )}
+% trace of matrix
+\newcommand{\tr}[1]{\textrm{tr}( #1 )}
+
+
+
+% 简写section title
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% The next page or two of stuff is devoted to creating and
+% manipulating the environments for lemma, proof, example, etc.
+% The first part is pretty simple, and almost everyone has commands
+% like this in every paper, article, book, etc.  
+% 
+% We start with things like lemmas, theorems, etc.
+
+%注释
+%\newtheorem{env name}{text}[parent counter]
+%\newtheorem{env name}[shared counter]{text}
+%parent counter: numbering will resteart whenever that sectional level is encountered
+%shared counter: if specificed, numbering will progress sequentially for 
+%all theorem element using this counter
+
+\theoremstyle{definition} 
+%adds extra space above and below, but sets the text in roman
+%recommended for definitions, conditions, problems, and examples
+
+\newtheorem{lemma}{Lemma}[chapter]
+\newtheorem{proposition}[lemma]{Proposition}
+\newtheorem{theorem}[lemma]{Theorem}
+\newtheorem{corollary}[lemma]{Corollary}
+\newtheorem{definition}[lemma]{Definition}
+
+%自定义新的theorem environment
+\newtheoremstyle{remarkstyle}
+    {\topsep}%   space above, empty for `usual value'
+    {\topsep}%   space below
+    {}%          body font, input \itshape for italian
+    {}%          indent amount 
+    {}%          thm head font 
+    {}%          Punctuation after thm head
+    {\newline}%  Space after thm head: \newline = linebreak
+    {}%          Thm head spec
+\theoremstyle{remarkstyle}
+\newtheorem*{remark}{Remark}%[chapter] 
+\newtheorem*{example}{Example}%[chapter]
+\newtheorem*{myproof}{Proof}%[chapter]
+%this formating (* and %[chapter]) elminates numbering for theorem environment
+
+%theorem之间的空间是手动调的，在最后加个\newline或者item[]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% The stuff that follows is a bit tricky, and is well more than most
+% people do with LaTeX.  The basic idea is that I want to be able to
+% show only examples, or only definitions, or hide only proofs, etc.  
+
+
+\makeatletter
+% the following key values give the set up for hiding certain
+% environemnts. Note that "true" is just a dummy value.  It would work
+% equally well with "foo".  Each one of these redefines the outer
+% environment for an atom to turn the whole thing into a hidden
+% comment.  Note that the environments theorem, example, etc. do not
+% have to be written in any special way for hide and show to work.
+% They get clobbered by hide.  
+  \define@key{hide}{lemma}[true]{\renewenvironment{lemma}{\comment}{\endcomment}}
+  \define@key{hide}{comments}[true]{\renewenvironment{comments}{\comment}{\endcomment}}
+  \define@key{hide}{corollary}[true]{\renewenvironment{corollary}{\comment}{\endcomment}}
+  \define@key{hide}{definition}[true]{\renewenvironment{definition}{\comment}{\endcomment}}
+  \define@key{hide}{example}[true]{\renewenvironment{example}{\comment}{\endcomment}}
+  \define@key{hide}{proposition}[true]{\renewenvironment{proposition}{\comment}{\endcomment}}
+  \define@key{hide}{theorem}[true]{\renewenvironment{theorem}{\comment}{\endcomment}}
+  \define@key{hide}{remark}[true]{\renewenvironment{remark}{\comment}{\endcomment}}
+  \define@key{hide}{myproof}[true]{\renewenvironment{myproof}{\comment}{\endcomment}}
+% Now this command can be given a comma separated list of names to
+% hide.  Thus, \HideEnvirons{ example, proof} would hide all examples
+% and proofs.
+\newcommand{\HideEnvirons}[1]{\setkeys{hide}{#1}}
+
+
+% The \ShowEnvirons command works like this: if it's argument is foo,
+% it redefines the *hide* family key for foo to do nothing.  Then, it
+% issues a \HideEnvirons command containing a list of all the atom
+% types.  So, everything is hidden *unless* the hide-family key has
+% been redefinied.
+  \define@key{show}{lemma}[true]{\define@key{hide}{lemma}{}}
+  \define@key{show}{comments}[true]{\define@key{hide}{comments}{}}
+  \define@key{show}{corollary}[true]{\define@key{hide}{corollary}{}}
+  \define@key{show}{definition}[true]{\define@key{hide}{definition}{}}
+  \define@key{show}{example}[true]{\define@key{hide}{example}{}}
+  \define@key{show}{proposition}[true]{\define@key{hide}{proposition}{}} 
+  \define@key{show}{theorem}[true]{\define@key{hide}{theorem}{}}
+  \define@key{show}{remark}[true]{\define@key{hide}{remark}{}}
+  \define@key{show}{myproof}[true]{\define@key{hide}{myproof}{}}
+% This command can be given a comma separated list of names to show,
+% and only these will be shown.  Thus,
+% \ShowEnvirons{example,definition} will show only examples and definitions.
+\newcommand{\ShowEnvirons}[1]
+{\setkeys{show}{#1}\HideEnvirons{%
+    comments,
+    corollary,
+    definition,
+    example,
+    proposition,
+    theorem,
+    lemma,
+    remark,
+    myproof
+  }}
+\makeatother
+
+% Comment out the next line to see the full text
+\ShowEnvirons{definition, proposition, theorem, remark, example, lemma, myproof, corollary}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+\setcounter{chapter}{5}
+\chapter{Representation of Finite Groups}
+% Tips facing very long chapter titles 
+% \chapter[medium-length title for Table of contents, if wanted]{full title name}
+% \chaptermark{short title for running headers}
+
+
+
+\section{Representations of Finite Groups}
+\begin{definition}
+    Let $V$ be a vector space. The \define{general linear group} of $V$ is
+    $$
+    GL(V) = \{L\,:\,V\rightarrow V\,\lvert\, L\,\textrm{is a bijective linear transformation}\}
+    $$
+\end{definition}
+\begin{remark}
+    $GL(V)$ is a group. Group operation is composition of functions, identity is the identity map, and inverse is the inverse of function. \newline
+\end{remark}
+
+\begin{definition}
+    Let $G$ be a finite group. A \define{representation} (a.k.a linear representation) of $G$ is a group homomorphism $\rho \,:\, G\rightarrow GL(V)$ where $V$ is a finite-dimensional vector space over $\C$. Define the degree of $\rho$ to be the dimension of $V$.
+\end{definition}
+\begin{remark}
+ A representation $\rho\,:\, G\rightarrow GL(V)$ induced an action of $G$ on $V$ by $g\cdot v=\rho(g)(v)$ with 
+        \begin{itemize}
+            \item $g\cdot(\alpha v + \beta w) = \alpha(g\cdot v) + \beta(g \cdot w) $ (linear transformation of $\rho(g)$
+            \item $(gh)\cdot v = g\cdot(h\cdot v) $ (composition)
+            \item $e_G\cdot v=v$ (identity)
+        \end{itemize}
+        We may write $\rho(g)(v)$ as $gv$ for simplicity. \newline
+
+\end{remark}
+
+\begin{definition}
+    Let $\rho \,:\, G\rightarrow GL(V)$ be a representation of a group $G$. If in addition $V$ has an inner product $\inner{\cdot,\cdot}$ s.t. 
+    $$
+    \inner{\rho(g)(v), \rho(g)w } = \inner{gv,gw} = \inner{v,w}
+    $$
+    for all $g\in G$ and $v,w\in V$, then we call $\rho$ a \define{unitary} representation with respect to $\inner{\cdot,\cdot}$. Consider $\rho$ as an action of $G$ on $V$, we also say $\inner{\cdot,\cdot}$ is $G-invariant$.
+\end{definition}
+\begin{remark}
+    Recall definition for a unitary operator (linear transformation):
+    $$
+    \inner{Tv, Tw} = \inner{v,w}
+    $$
+    for all $v,w\in V$. Also recall that the matrix representation of the operator under the same inner product must be unitary.
+\end{remark}
+\begin{remark}
+    The trivial representation $\phi\,:\,G\rightarrow GL(\C)$ by $\phi(g)\alpha=\alpha$ for all $g\in G$ and $\alpha\in \C$ is unitary with respect to $\inner{\cdot,\cdot}_2$, the standard inner product on $\C$ given by $\inner{\alpha,\beta}_2=\alpha\overline{\beta}$. Since 
+    $$
+    \inner{\phi(g)\alpha,\phi(g)\beta}_2 = \inner{\alpha,\beta}_2
+    $$
+    \newline
+\end{remark}
+
+\begin{definition}
+    Let $G$ be a finite group. Recall that
+    $$
+    L^2(G) = \{f\,:\,G\rightarrow\C\}
+    $$
+    The \define{right regular representation}, $R\,:\, G\rightarrow GL(L^2(G)) $, is defined by 
+    $$
+    R(\gamma)f(g) = f(g\gamma)
+    $$
+    for all $f\in L^2(G)$ and $\gamma,g\in G$
+\end{definition}
+\begin{example}
+    Consider $f\in L^2(\Z_4)$ by 
+    $$
+    f(n) = \left\{ 
+    \begin{array}{ll}
+         1 & n = 0 \\
+         0 & n = 1 \\
+         1-15i & n = 2 \\
+         -2/3 & n = 3
+    \end{array}
+    \right.
+    $$
+    Then $R(1)f(n) = f(1n) = f(n+1) $. Hence, 
+        $$
+    R(1)f(n) = \left\{ 
+    \begin{array}{ll}
+         0 & n = 0 \\
+         1-15i & n = 1 \\
+         -2/3 & n = 2 \\
+         1 & n = 3
+    \end{array}
+    \right.
+    $$
+    \newline
+\end{example}
+
+\begin{lemma}
+    \begin{itemize}
+        \item Properties of right regular representation
+        \item $R$ is a homomorphism 
+        \item $R$ is unitary with respect to the standard inner product on $L^2(G)$
+        \item Degree of $R$ is $\abs{G}$
+    \end{itemize}
+\end{lemma}
+\begin{myproof}
+    \begin{itemize}
+        \item[]
+        \item Let $\gamma, \gamma',g\in G$ and $f\in L^2(G)$. Then 
+        $$
+        R(\gamma\gamma')f(g) = f(g\gamma\gamma')
+        $$
+        while 
+        $$
+        R(\gamma)[R(\gamma')f](g) = R(\gamma')f(g\gamma) = f(g\gamma\gamma')
+        $$
+        \item Let $f,h\in L^2(G)$ and $\gamma\in G$, then 
+        \begin{align*}
+            \inner{R(\gamma)f,R(\gamma)h}_2 
+            &= \sum_{g\in G}R(\gamma)f(g)\overline{R(\gamma)h(g)} \\
+            &= \sum_{g\in G}f(g\gamma)\overline{h(g\gamma} \\
+            &= \sum_{x\in G}f(x)\overline{h(x)} \\
+            &\textrm{group is closed, just a permutation} \\
+            &= \inner{f,h}_2
+        \end{align*}
+        \item Recall the standard basis remark for Def. 1.10, the dimension of $L^2(G)$ is $\abs{G}$.
+        \item[] 
+    \end{itemize}
+\end{myproof}
+
+\begin{definition}
+    Let $G$ be a finite group. A \define{matrix representation} of $G$ is a homomorphism $\pi\,:\, G\rightarrow GL(n,\C) $. The degree of $\pi$ is $n$. We say $\pi$ is a unitary matrix representation if $\pi(g)$ is a unitary matrix for all $g\in G$. \newline
+\end{definition}
+
+\begin{lemma}
+    Let $G$ be a finite group. One can go back and forth between two different definitions of group representations as follows. 
+    \begin{itemize}
+        \item Let $\pi\,:\, G\rightarrow GL(n,\C)$ be a matrix representation of $G$ of degree $n$. Then the map $\rho\,:\, G\rightarrow GL(\C^n)$ defined by $\rho(g)(v)=\pi(g)v$ is a representation of $G$ of degree $n$.
+        \item Let $\rho\,:\, G\rightarrow GL(V)$ be a representation of degree $n$. Fix an ordered basis $\beta$ for $V$. We can define a matrix representation $\pi\,:\, G\rightarrow GL(n, \C)$ by $\pi(g) = [\rho(g)]_\beta $. The degree of $\pi$ is $n$. We can check that $\pi$ is indeed a homomorphism.
+        \item Suppose we chose a different basis $\beta'$. Then, there exists an invertible matrix $Q$ s.t. $[\rho(g)]_{\beta'} = Q^{-1}[\rho(g)]_\beta Q $. That is, $[\rho(g)]_\beta$ and $[\rho(g)]_{\beta'} $ are similar matrices.
+    \end{itemize}
+\end{lemma}
+\begin{myproof}
+    This is essentially linear algebra. Ordered basis is used to write vectors in coordinate form. Write $[v]_\beta $ for vector $v$ expressed as coordinate form by ordered basis $\beta$.
+    \begin{itemize}
+        \item In general, for linear transformation $L\,:\, V\rightarrow W$, with ordered basis $\beta = [v_1,v_2,\dots,v_n] $ for $V$ and $\gamma$ for $W$, we have the corresponding matrix of $L$ with respect to $\beta$ and $\gamma$ as 
+        $$
+        [L]^\gamma_\beta = \left( [L(v_1)]_\gamma\ \;\Big\vert\; [L(v_2)]_\gamma \;\Big\vert\; \dots \;\Big\vert\; [L(v_n)]_\gamma \right)
+        $$
+        If $V=W$ and $\beta = \gamma$, we write as $[L]_\beta $
+        \item Intuitively, you first write vector as coordinate by basis $\beta$, then the matrix tells you how much value you get under coordinate $\gamma$ for 1 unit under coordinate $\beta$ after transformation $L$, and you multiple this ratio to each entry of coordinate of the vector under $\beta$, done. That is,
+        $$
+        [L(v)]_\gamma = [L]^\gamma_\beta[v]_\beta = \left( [L(v_1)]_\gamma\ \;\Big\vert\; [L(v_2)]_\gamma \;\Big\vert\; \dots \;\Big\vert\; [L(v_n)]_\gamma \right) (a_1, a_2, \dots, a_n)_\beta^T
+        $$
+        \item Note in general the changes in coordinate come from both the change of basis and the linear transformation. By making $L$ as the identity transformation $I$ (hence no change), we have a matrix that changes basis only. That is 
+        $$
+        [v]_\gamma = [I(v)]_\gamma = [I]^\gamma_\beta[v]_\beta
+        $$
+        \item Denote $Q = [I]^\gamma_\beta $, we know:
+        \begin{itemize}
+            \item $Q$ is invertible and $Q^{-1} = [I]^\beta_\gamma $
+            \item For any $v\in V$, $[v]_\gamma = Q[v]_\beta $
+            \item $[L]_\beta = Q^{-1}[L]_\gamma Q$
+        \end{itemize}
+        \item Homomorphism of $\pi$ from linear transformation
+        \item[] 
+    \end{itemize}
+\end{myproof}
+
+\begin{definition}
+    Let $\rho\,:\,G \rightarrow GL(V) $ and $\phi\,:\, G\rightarrow GL(W)$ be two representations of $G$. Let $\theta\,:\,V\rightarrow W$ be a map.
+    \begin{itemize}
+        \item If $\theta(\rho(g)v) = \phi(g)\theta(v) $ for all $g\in G$ and $v\in V$, then $\theta$ is $G-invariant$
+        \item A $G-homomorphism$ is a $G$-invariant linear transformation
+        \item If in addition $\theta$ is a vector space isomorphism, then we say $V$ and $W$ are equivalent and write $V\cong W$, $\rho \cong \phi$
+    \end{itemize}
+\end{definition}
+\begin{remark}
+    $G$-invariant means $\theta$ commutes with the action of $G$, so it does not matter whether apply $\theta$ first or apply $G$-action first. In Def. 6.3 we discussed a special case of inner product. 
+\end{remark}
+\begin{remark}
+    Let $\rho\,:\,G \rightarrow GL(V) $ and $\phi\,:\, G\rightarrow GL(W)$ be two representations of $G$. Let $\theta\,:\,V\rightarrow W$ be $G$-homomorphism. Let $\beta$ be an ordered basis for $V$ and $\gamma$ be an ordered basis for $W$. Then, translating Def. 6.8 into matrices,
+    $$
+    [\theta]^\gamma_\beta[\rho(g)]_\beta[v]_\beta = [\phi(g)]_\gamma[\theta]^\gamma_\beta[v]_\beta
+    $$
+    for all $v\in V$ and $g\in G$. Thus 
+    $$
+    [\theta]^\gamma_\beta[\rho(g)]_\beta = [\phi(g)]_\gamma[\theta]^\gamma_\beta
+    $$
+    Moreover, if $\theta$ is an isomorphism (hence corresponding matrix is invertible), then 
+    $$
+    [\theta]^\gamma_\beta[\rho(g)]_\beta([\theta]^\gamma_\beta)^{-1} = [\phi(g)]_\gamma
+    $$
+    \newline
+\end{remark}
+
+\begin{definition}
+    Let $G$ be a finite group and $\phi, \pi\,:\, G\rightarrow GL(n,\C) $ be two matrix representations of $G$. We say that $\phi$ and $\pi$ are equivalent if there is a matrix $Q\in GL(n,\C)$ s.t. $Q\phi(g)Q^{-1} = \pi(g) $ for all $g\in G$, and write $\phi\cong\pi$. That is, for the same element in $G$, we always get similar matrices under two matrix representations.
+\end{definition}
+\begin{remark}
+    In 
+    $$
+    [\theta]^\gamma_\beta[\rho(g)]_\beta([\theta]^\gamma_\beta)^{-1} = [\phi(g)]_\gamma
+    $$
+    Let $\theta = I$, where $I$ is the identity map (hence identity matrix). Then we have $\rho\cong\phi$ from Def.6.8. Denote $[I]^\gamma_\beta = Q$, the change of basis matrix. Then,
+    $$
+    Q[\rho(g)]_\beta Q^{-1} = [\phi(g)]_\gamma
+    $$
+    Again denote $[\rho(g)]_\beta=\pi(g), [\phi(g)]_\gamma = \phi(g)$, i.e. matrix corresponding to linear transformations. Then, 
+    $$
+    Q\pi(g)Q^{-1} = \phi(g)
+    $$
+    That is, equivalent matrix representations of $G$ can be thought of as arising from equivalent (the same) representation of $G$. \newline
+\end{remark}
+
+
+
+\section{Decomposing into Irreducible Representations}
+Next section will show that these decomposition is unique. \newline
+
+\begin{definition}
+\begin{itemize}
+    \item[]
+    \item Let $G$ be a finite group and $\rho\,:\,G\rightarrow GL(V)$ be a representation of $G$. We say that a subspace $W$ of $V$ is a $G-invariant subspace$, or $subrepresentation$ of $V$, if $\rho(g)(w)\in W$ for all $g\in G, w\in W$
+    \item The $G$-invariant subspace $\{0\}$ and $V$ are trivial subrepresentations of $V$
+    \item $V$ is \define{reducible} if it contains a nontrivial $G$-invariant subspace $W$. Otherwise, we say that $V$ is \define{irreducible}, or $V$ is an \define{irrep}
+\end{itemize}
+\end{definition}
+\begin{remark}
+    We should distinguish "the" trivial representation (one dimensional representation that sends every $g\in G$ to identity) and trivial representations (representations that sends every $g\in G$ to the identity map of some space $V$). Clearly, "the" trivial representation is a trivial representation, and it is irreducible (since $\C$ do not have nontrivial subspaces / subrepresentations). All other trivial representations that is not equivalent to "the" trivial representation is reducible (any subspace would be invariant, and they all have nontrivial subspaces).
+\end{remark}
+\begin{remark}
+    Let $\rho(g)\rvert_W$ denotes the restriction of $\rho(g)$ to the subspace $W\subset V$, we have $\rho(g)\rvert_W\,:\,W\rightarrow W$. Hence we can define a new representation $\rho_W\,:\, G\rightarrow GL(W)$ by $\rho_W(g)=\rho(g)\rvert_W$
+\end{remark}
+\begin{remark}
+    Suppose that $W$ and $W'$ are subrepresentations of $V$ and that $V=W \bigoplus W'$. Let $v\in V$, then $v=w+w'$ for some uniquely determined $w\in W, w'\in W'$. Let $\rho, \rho_W, \rho_{W'} $ be defined respectively, then
+    $$
+    \rho(g)(v) = \rho(g)(w)+\rho(g)(w') = \rho_W(g)(w) + \rho_{W'}(g)(w')
+    $$
+    \newline
+\end{remark}
+
+\begin{definition}
+    Under the conditions of previous remark, we say that $\rho$ is the \define{direct sum} of $\rho_W, \rho_{W'} $, and we write $\rho = \rho_W \bigoplus \rho_{W'} $. We also write $n\pi$ for $\pi$ being direct summed $n$ times. \newline
+\end{definition}
+
+\begin{definition}
+    Let $X,Y,Z$ be matrices. We say $X=Y\bigoplus Z$ if 
+    $$
+    X = \left(
+    \begin{array}{cc}
+        Y & 0 \\
+        0 & Z 
+    \end{array}
+    \right)
+    $$
+    We also write $nX$ for $X$ being direct summed $n$ times. \newline
+\end{definition}
+
+\begin{definition}
+\begin{itemize}
+    \item[]
+    \item Given two matrix representations $\pi_1$ and $\pi_2$ of a group $G$, define the \define{direct sum} of $\pi_1$ and $\pi_2$, denoted $\pi_1\bigoplus\pi_2$, as the matrix representation of $G$ given by $(\pi_1\bigoplus\pi_2)(g)=\pi_1(g)\bigoplus\pi_2(g)  $. Write $n\pi$ for $\pi$ being direct summed $n$ times. 
+    \item Let $\phi\,:\, G\rightarrow GL(n,\C) $ be a matrix representation for a finite group $G$. We say that $\phi$ is reducible if $\phi\cong\pi_1\bigoplus\pi_2$ for some matrix representations $\pi_1,\pi_2$ of $G$. Otherwise, $\phi$ is \define{irreducible}, or an \define{irrep}.
+\end{itemize}
+\end{definition}
+\begin{remark}
+    Let $\rho\,:\,G\rightarrow GL(V)$ be a representation of a finite group $G$, and $V=V_1\bigoplus V_2\bigoplus\cdots\bigoplus V_n$, where each $V_i$ is a $G$-invariant subspace of $V$ with respect to $\rho$. Let $\beta_i$ be a basis for $V_i$, $\beta=\bigcup^n_{i=1}\beta_i $ and $\rho_i(g)=\rho(g)\rvert_{V_i}$, then 
+    $$
+    [\rho(g)]_\beta = \left(
+    \begin{array}{cccc}
+        [\rho_1(g)]_{\beta_1} & 0 & \dots & 0 \\
+        0 & [\rho_2(g)]_{\beta_2} & \dots & 0 \\
+        \vdots & \vdots & \ddots & \vdots \\
+        0 & 0 & \dots & [\rho_n(g)]_{\beta_n}
+    \end{array}
+    \right)
+    $$
+    for every $g\in G$. \newline
+\end{remark}
+
+\begin{lemma}
+    Let $\rho\,:\,G\rightarrow GL(V)$ be a representation of a finite group $G$. Then there exists a $G$-invariant inner product on $V$.
+\end{lemma}
+\begin{myproof}
+    Let $\beta=[v_1,v_2,\dots,v_n] $ be an arbitrary ordered basis of $V$. Define an inner product on $V$ following the basis as below. Given 
+    \begin{align*}
+        v &= a_1v_1 + a_2v_2 + \dots + a_nv_n \\
+        w &= b_1w_1 + b_2w_2 + \dots + b_nw_n
+    \end{align*}
+    Define 
+    $$
+    \inner{v,w} = a_1\overline{b_1} + a_2\overline{b_2} + \dots + a_n\overline{b_n}
+    $$
+    This is indeed an inner product. Bilinear, conjugate symmetry, and positive definite are all obvious.
+    However, $\rho$ may not be unitary with respect to this inner product. Define another inner product $\inner{}'$
+    $$
+    \inner{v,w}'=\sum_{g\in G}\inner{\rho(g)v, \rho(g)w}
+    $$
+    Then $\rho$ is unitary with respect to $\inner{}'$
+    \begin{align*}
+        \inner{\rho(t)v,\rho(t)w }' 
+        &= \sum_{g\in G}\inner{\rho(g)\rho(t)v,\rho(g)\rho(t)w} \\
+        &= \sum_{x\in G}
+    \end{align*}
+    \newline 
+\end{myproof}
+
+\begin{theorem}
+    \textbf{Maschke's Theorem} \newline
+    Every unitary representation of a finite group can be completely decomposed into orthogonal irreducible representations. \newline 
+    Let $V$ be a unitary representation of $G$ with a $G$-invariant $\inner{\cdot,\cdot}$. Then there exists irreducible subrepresentations $V_1, \dots, V_n$ of $V$ s.t.
+    $$
+    V = V_1 \bigoplus V_2 \bigoplus \cdots \bigoplus V_n
+    $$
+\end{theorem}
+\begin{remark}
+    Equivalently, (after combining copies of identical representations (subrepresentations) this is also to say: \newline
+    Given unitary representation $\rho$ ($V$) of $G$ with a $G$-invariant $\inner{,}$, there exists irreducible representations $\rho_1,\dots,\rho_n$ (subrepresentations $V_1,\dots,V_n \in V$) s.t. 
+    \begin{align*}
+        \rho &= a_1\rho_1 \bigoplus \dots \bigoplus a_n\rho_n \\
+        V &= a_1V_1 \bigoplus \dots \bigoplus a_nV_n
+    \end{align*}
+\end{remark}
+\begin{myproof}
+    Proof idea: if $V$ is not irreducible, then decompose it as the direct sum of a subrepresentation and its orthogonal complement to reduce the dimension. Show the complement is also a subrepresentation, then induction follows. 
+    \begin{itemize}
+        \item For nontrivial $V$, $V=W\bigoplus W^\perp$ 
+        \item Key step: given $W$ as a nontrivial $G$-invariant subspace of $V$, its orthogonal complement $W^\perp$ is also a subrepresentation.
+    \end{itemize}
+\end{myproof}
+
+\begin{corollary}
+    Let $\rho\,:\, G\rightarrow GL(n,\C)$ be a unitary matrix representation of a finite group $G$, then there is a unitary matrix $Q\in GL(n,\C) $ s.t. 
+    $$
+    Q^{-1}\rho(g)Q=\left(
+    \begin{array}{cccc}
+        [\rho_1(g)] & 0 & \dots & 0 \\
+        0 & [\rho_2(g)] & \dots & 0 \\
+        \vdots & \vdots & \ddots & \vdots \\
+        0 & 0 & \dots & [\rho_n(g)]
+    \end{array}
+    \right)
+    $$
+    for every $g\in G$, where each $\rho_i$ is an irreducible matrix representation of $G$.
+\end{corollary}
+\begin{remark}
+    $Q$ here is essentially the change of basis matrix. The statement is just translating Maschke's theorem (linear transformation form) into matrix form. \newline
+\end{remark}
+
+\begin{lemma}
+    Any matrix representation of $G$ is equivalent to a unitary matrix representation of $G$.
+\end{lemma}
+\begin{myproof}
+    \begin{itemize}
+        \item[]
+        \item Assume $dim(V)=n$. Suppose $\rho\,:\, G\rightarrow GL(V)$ is a unitary representation with respect to some inner product $\inner{,}$. Let $\beta=[v_1,\dots,v_n] $ be an ordered orthonormal basis for $V$ with respect to $\inner{,}$ (existence guaranteed by Gram-Schmidt process). Easy to check that $[\rho(g)]_\beta $ is a unitary matrix for all $g\in G$.
+        \item Suppose $\pi\,:\,G\rightarrow GL(n,\C)$ is a matrix representation of $G$. Then, by Lemma 6.7, a representation $\rho\,:\, G\rightarrow GL(\C^n)$ is defined. Take the inner product that makes $\rho$ unitary as the inner product of $GL(n,\C)$. By previous argument, this representation has a corresponding basis s.t. $[\rho(g)]_\beta $ is unitary to for every $g\in G$. Then, there exists a change-of-basis matrix $Q$ s.t. the matrix representation $\phi(g)=T^{-1}\pi(g)T $ is unitary. That is, simply change the basis for $\pi$ (for every $\pi(g)$) and we get a unitary matrix representation that is equivalent to $\pi$.
+        \item The key here is that the inner product of $\C^n$ need not to coincidence with the inner product that makes $\rho$ unitary. $[\rho(g)]_\beta $ will always be a unitary matrix whatever the inner product of the space is.
+        \item[] 
+    \end{itemize}
+\end{myproof}
+
+
+
+
+
+\section{Schur's Lemma and Characters of Representation}
+\begin{definition}
+    Let $G$ be a finite group. 
+    \begin{itemize}
+        \item Let $\pi\,:\,G\rightarrow GL(n,\C)$ be a matrix representation. The character of $\pi$, denoted $\chi_\pi$, is $\chi_\pi(g)=\tr{\pi(g)}$ for all $g\in G$. ($\tr{}$ means trace of a matrix)
+        \item Let $\rho\,:\,G\rightarrow GL(V)$ be a representation of $G$. The character of $\rho$, denoted $\chi_\rho$, is $\chi_\rho(g) = \tr{[\rho(g)]_\beta}$, where $\beta$ is any basis of V. 
+        \item Suppose $\chi$ is the character of a representation (matrix representation) $\rho$ on $G$, then degree of $\chi$ is $\chi(e_G)$. 
+        \item A character $\chi$ is an irreducible character if there exists an irreducible representation $\rho$ s.t. $\chi=\chi_\rho$.
+    \end{itemize}
+\end{definition}
+\begin{remark}
+    \begin{itemize}
+        \item[] 
+        \item Character is a function, but with $G\rightarrow \R$
+        \item Similar matrices have the same trace (since trace is the sum of all eigenvalues), so the character of representation $\rho$ is independent of the choice of basis.
+        \item Since $e_G$ is always mapped to the identity matrix (representation must be a homomorphism), for $\rho\,:\,G\rightarrow GL(V)$, $\chi(e_G) = dim(V) $. 
+        \item In Corollary 6.27 we see that two representations are equivalent iff they have the same character. Hence, we can say $\chi_\rho$ is irreducible iff $\rho$ is irreducible.
+        \item[] 
+    \end{itemize}
+\end{remark}
+
+\begin{definition}
+    Group $G$, $g,h\in G$. $g,h$ are conjuage in $G$ if $g=xhx^{-1} $ for some $x\in G$. The conjugacy class of $g$ is 
+    $$
+    K_g = \{xgx^{-1}\,\lvert\,x\in G\}
+    $$
+    \newline
+\end{definition}
+
+\begin{lemma}
+    Finite group $G$, representations (matrix representations) $\phi,\pi$ of $G$ with characters $\chi,\psi$. Then
+    \begin{itemize}
+        \item If $g,h$ conjugate in $G$, then $\chi(g)=\chi(h)$. That is, characters are constant on conjugacy classes. 
+        \item If $\phi\cong\pi$, then $\chi=\psi$
+    \end{itemize}
+\end{lemma}
+\begin{remark}
+    To define a character, suffice to define it for every conjugacy class of $G$.
+\end{remark}
+\begin{myproof}
+    We prove for matrix representations of $G$, and the proof extends to representations by choosing bases. 
+    \begin{itemize}
+        \item Suppose $g=xhx^{-1} $ for some $x\in G$. Then 
+        \begin{align*}
+            \chi(g) &= \tr{\phi(g)} = \tr{\phi(x)\phi(h)\phi(x)^{-1}} \\
+            &\textrm{homomorphism} \\
+            &= \tr{\phi(h)} = \chi(h) \\
+            &\textrm{similar matrix same trace}
+        \end{align*}
+        \item If $\phi\cong\pi$, then $\phi(g)=X\pi(g)X^{-1} $ for all $g\in G$. Then 
+        $$
+        \chi(g) = \tr{\phi(g)} = \tr{X\pi(g)X^{-1}} = \tr{\pi(g)} = \psi(g)
+        $$
+        \item[]
+    \end{itemize}
+\end{myproof}
+
+\begin{theorem}
+    (Schur's Lemma) \newline
+    Let $V,W$ be irreducible representations of $G$, let $\theta\,:\,V\rightarrow W$ be a $G$-homomorphism. Then either $\theta$ is the zero map or $\theta$ is an isomorphism, in which case two representations are equivalent.
+\end{theorem}
+\begin{myproof}
+    \begin{itemize}
+        \item[]
+        \item Let $ker(\theta)$ be the kernel, $im(\theta)$ be the image. Then clearly $ker(\theta)\subset V$ and $im(\theta)\subset W$.
+        \item Let $v\in ker(\theta), g\in G$. Then $\theta(g\cdot v)=g\cdot\theta(v)$ ($G$-invariant) $=g\cdot0=0$, so $g\cdot v\in ker(\theta)$, thus $ker(\theta)$ is a subrepresentation of $V$. 
+        \item Let $\theta(v) \in im(\theta), g\in G$. Then $g\cdot\theta(v)=\theta(g\cdot v) \in im(\theta)$, also a subrepresentation. 
+        \item Since $V$ is irreducible, it only contains trivial subrepresentations, therefore either $ker(\theta)=V$ or $ker(\theta)=\{0\}$. Same argument for $im(\theta)$. Because $\theta$ is also a linear transformation, put everything together, we either have $ker(\theta)=V$ and $im(\theta)=\{0\}$, or $ker(\theta)=\{0\}$ and $im(\theta)=V$. Thus, $\theta$ is either the zero map or else an isomorphism.
+        \item[] 
+    \end{itemize}
+\end{myproof}
+
+\begin{corollary}
+    (Matrix version Schur's Lemma) \newline
+    Let $\pi\,:\,G\rightarrow GL(n,\C)$ and $\phi\,:\,G\rightarrow GL(m,\C)$ be irreducible matrix representations of $G$, suppose that $Z$ is an $n\times m$ matrix and $\pi(g)Z=Z\phi(g)$ for all $g\in G$. Then either $Z$ is the zero matrix or $Z$ is an invertible matrix, in which case $\pi\cong\phi$. \newline
+\end{corollary}
+
+\begin{corollary}
+     Let $\pi\,:\,G\rightarrow GL(n,\C)$ be an irreducible matrix representation of $G$. A matrix $X\in GL(n,\C)$ has $X\pi(g)=\pi(g)X$ for all $g\in G$ iff $X=cI$, where $c\in \C$ and $I$ is the $n\times n$ identity matrix. 
+\end{corollary}
+\begin{myproof}
+    Suppose $X$ has $X\pi(g)=\pi(g)X$ for all $g\in G$. Let $c$ be an eigenvalue of $X$, then $det(X-cI)=0$ and $X-cI$ not invertible. Also, we have $(X-cI)\pi(g)=\pi(g)(X-cI)$ as an implication. Then, by Corollary 6.22, $X-cI=0$, done. Conversely, every matrix of form $X=cI$ commutes with $\pi(g)$ for all $g\in G$, done. \newline
+\end{myproof}
+
+\begin{lemma}
+    Let $\pi\,:\,G\rightarrow GL(n,\C)$ and $\phi\,:\,G\rightarrow GL(m,\C)$ be irreducible unitary matrix representations of $G$. Denote entries of these matrices as $\pi_{i,j}(g)$ and $ \phi_{r,s}(g) $. The coordinate functions $\pi_{i,j}, \phi_{r,s} $ are elements of $L^{2}(G) $, and they have following orthogonality relations with respect to the standard inner product on $L^{2}(G) $.
+    \begin{itemize}
+        \item The coordinate functions of inequivalent, irreducible unitary representations are orthogonal. For inequivalent $\pi, \phi$
+        $$
+        \inner{\pi_{i,j},\phi_{r,s}}_2 = 0
+        $$
+        \item The coordinate functions of an irreducible unitary representation (or, equivalent representations) are pairwise orthogonal. 
+        $$
+        \inner{\pi_{i,j},\pi_{r,s} }_2 = 
+        \left\{ 
+        \begin{array}{ll}
+             \abs{G}/n & \textrm{if $i=r$ and $j=s$}  \\
+             0 & \textrm{otherwise} 
+        \end{array}
+        \right.
+        $$
+    \end{itemize}
+\end{lemma}
+\begin{remark}
+    Note unitary matrix has nothing to do with inner product.
+\end{remark}
+\begin{myproof}
+    \begin{itemize}
+        \item[]
+        \item Suppose inequivalent $\pi,\phi$. Given arbitrary $j,s$, let $E_{j,s} $ be the $n\times m$ matrix with a 1 on $(j,s)$ entry and 0 everywhere else. Define the $n\times m$ matrix $Y$
+        $$
+        Y = \sum_{g\in G}\pi(g)E_{j,s}\phi(g^{-1}) = \sum_{g\in G}\pi(g)E_{j,s}\overline{\phi(g)^{T}}
+        $$
+        where the second equality follows because $\phi(g)$ is a unitary matrix and so $\phi(g)\overline{\phi(g)^{T}}=I$ \newline
+        For each $h\in G$, note
+        \begin{align*}
+            \pi(h)Y 
+            &= \sum_{g\in G}\pi(hg)E_{j,s}\phi(g^{-1}) = \sum_{x\in G}\pi(x)E_{j,s}\phi(x^{-1}h) \\
+            &= \left(\sum_{x\in G}\pi(x)E_{j,s}\phi(x^{-1})\right)\phi(h) = Y\phi(h)
+        \end{align*}
+        where $x=hg$ and thus $g^{-1}=x^{-1}h$. Since $\pi$ not equivalent to $\phi$, then by Corollary 6.22 $Y=0$. Now compute (matrix multiplication) $Y$
+        \begin{align*}
+            0 &= \sum_{g\in G}\pi(g)E_{j,s}\overline{\phi(g)^{T}}
+            &= \sum_{g\in G}\left(
+            \begin{array}{ccc}
+                \pi_{1,j}(g)\overline{\phi_{1,s}(g)} & \cdots & 
+                \pi_{1,j}(g)\overline{\phi_{m,s}(g)}  \\
+                \vdots & \ddots & \vdots \\
+                \pi_{n,j}(g)\overline{\phi_{1,s}(g)} & \cdots &
+                \pi_{n,j}(g)\overline{\phi_{m,s}(g)}
+            \end{array}
+            \right)
+        \end{align*}
+        Hence every entry of the ultimate matrix is 0. Also note by definition of standard inner product, each entry is just the result of an inner product
+        $$
+        \inner{\pi_{i,j},\phi_{r,s}}_2 = \sum_{g\in G}\pi_{i,j}(g)\overline{\phi_{r,s}(g)} = 0
+        $$
+        \item Let $E_{j,s} $ be defined as above. Define 
+        $$
+        Y = \sum_{g\in G}\pi(g)E_{j,s}\pi(g^{-1})
+        $$
+        As before, for each $h\in G$, we have $\pi(h)Y=Y\pi(h)$. By Corollary 6.22, since $\pi\cong\pi$, we must have $Y=cI$, where $I$ is the $n\times n$ identity matrix. Then $\tr{Y}=nc$, so 
+        \begin{align*}
+            c &= \frac{\tr{Y}}{n} = \frac{1}{n}\tr{\sum_{g\in G}\pi(g)E_{j,s}\pi(g^{-1})} \\
+            &= \frac{1}{n}\sum_{g\in G}\tr{\pi(g)E_{j,s}\pi(g)^{-1}} \\
+            &\textrm{sum of trace is trace of sum, also $\pi$ is homomorphism} \\
+            &= \frac{1}{n}\sum_{g\in G}\tr{E_{j,s}} \\
+            &= \left\{
+            \begin{array}{ll}
+                \frac{\abs{G}}{n} & j=s  \\
+                0 & \textrm{otherwise}
+            \end{array}
+            \right.
+        \end{align*}
+        Same as part 1, we have 
+        $$
+        cI = Y = \sum_{g\in G}\left(
+            \begin{array}{ccc}
+                \pi_{1,j}(g)\overline{\phi_{1,s}(g)} & \cdots & 
+                \pi_{1,j}(g)\overline{\phi_{m,s}(g)}  \\
+                \vdots & \ddots & \vdots \\
+                \pi_{n,j}(g)\overline{\phi_{1,s}(g)} & \cdots &
+                \pi_{n,j}(g)\overline{\phi_{m,s}(g)}
+            \end{array}
+            \right)
+        $$
+        Hence 
+        \begin{align*}
+            \inner{\pi_{i,j},\pi_{r,s}}_2 
+             &= \sum_{g\in G}\pi_{i,j}(g)\overline{\pi_{r,s}(g)} = Y_{i,r} = (cI)_{i,r} \\
+             &= \left\{
+            \begin{array}{ll}
+                \frac{\abs{G}}{n} & \textrm{if $i=r$ and $j=s$}  \\
+                0 & \textrm{otherwise}
+            \end{array}
+            \right.
+        \end{align*}
+        That is, only get value for diagonal entries. \newline
+    \end{itemize}
+\end{myproof}
+
+\begin{theorem}
+    Let $\pi$ and $\phi$ be irreducible representations (or matrix representations) of $G$ with corresponding characters $\chi,\psi$ respectively. Then 
+    $$
+    \inner{\chi,\psi}_2 = \left\{
+    \begin{array}{ll}
+        \abs{G} & \pi\cong\phi  \\
+         0 & \textrm{otherwise} 
+    \end{array}
+    \right.
+    $$
+\end{theorem}
+\begin{myproof}
+    Prove for matrix representations. The same proof works for representations by picking bases. By Lemma 6.17, since every matrix representation is equivalent to a unitary matrix representation (thus having same character), for discussion on characters, we can assume that $\pi,\phi$ are unitary.
+    \begin{itemize}
+        \item Suppose $\pi\cong\phi$, by Lemma 6.20 (2), $\chi=\psi$. Hence, by Lemma 6.24 (for last equality),
+        \begin{align*}
+            \inner{\chi,\psi}_2 
+            &= \inner{\chi,\chi}_2 \\
+            &= \sum_{g\in G}\chi(g)\overline{\chi(g)} = \sum_{g\in G}\tr{\pi(g)}\overline{\tr{\pi(g)}} \\
+            &= \sum_{g\in G}\sum_{a=1}^{n}\sum_{b=1}^{n}\pi_{a,a}(g)\overline{\pi_{b,b}(g)} \\
+            &= \sum_{a=1}^{n}\sum_{b=1}^{n}\sum_{g\in G}\pi_{a,a}(g)\overline{\pi_{b,b}(g)} \\
+            &= \sum_{a=1}^{n}\sum_{b=1}^{n}\inner{\pi_{a,a},\pi_{b,b}}_2 \\
+            &= n \cdot \frac{\abs{G}}{n} = \abs{G}
+        \end{align*}
+        \item Suppose otherwise, then by Lemma 6.24 again 
+        $$
+        \inner{\chi,\psi}_2 = \sum_{g\in G}\chi(g)\overline{\psi(g)} = \sum_{a=1}^{n}\sum_{b=1}^{m}\inner{\pi_{a,a},\phi_{b,b}}_2 = 0
+        $$
+        \newline
+    \end{itemize}
+\end{myproof}
+
+\begin{corollary}
+    Let $\pi$ be a representation (matrix representation) of $G$ with character $\chi$. Suppose that 
+    $$
+    \pi \cong a_1\pi_1 \bigoplus \cdots \bigoplus a_n\pi_n
+    $$
+    where $\pi_i$ are pairwise inequivalent irreducible representations (matrix representations) of $G$. Let $\chi_i$ be the character of $\pi_i$. Then 
+    \begin{itemize}
+        \item $\chi=a_1\chi_1+\dots+a_n\chi_n$
+        \item Suppose $\phi$ is an irreducible representation (matrix representation) of $G$ with character $\psi$, then 
+        $$
+        \inner{\chi,\psi}_2 = \left\{
+        \begin{array}{ll}
+            a_i\abs{G} & \textrm{if $\phi\cong\pi_i$ for some $i$}  \\
+            0 & \textrm{otherwise} 
+        \end{array}
+        \right.
+        $$
+        In particular, $\inner{\chi,\chi_i}_2=a_i\abs{G}$
+        \item $\pi$ is irreducible iff $\inner{\chi,\chi}_2=\abs{G}$
+    \end{itemize}
+\end{corollary}
+\begin{remark}
+    (3) of this corollary is often the most efficient way to determine whether a representation is irreducible.
+\end{remark}
+\begin{myproof}
+    \begin{itemize}
+        \item[]
+        \item If $g\in G$, then 
+        \begin{align*}
+            \chi(g) &= \tr{\pi(g)} = \tr{\bigoplus^{n}_{i=1}a_i\pi_i(g)} \\
+            &= \sum_{i=1}^{n}a_i\tr{\pi_i(g)} = \sum_{i=1}^{n}a_i\chi_i(g)
+        \end{align*}
+        (trace of big matrix = sum of traces of all diagonal blocks)
+        \item Suppose $\pi\,:\,G\rightarrow GL(V)$ is a representation. By remark of Def 6.13 and Maschke' Theorem, there exist bases $\beta$ for $V$ and $\beta_i$ for subrepresentations s.t. 
+        $$
+        [\pi(g)]_\beta = a_1[\pi_1(g)]_{\beta_1} \bigoplus \dots \bigoplus a_n[\pi_n(g)]_{\beta_n}
+        $$
+        for all $g\in G$. Take the trace for both side 
+        $$
+        \chi(g) = a_1\chi_1(g) + \dots + a_n\chi_n(g)
+        $$
+        \item Note 
+        $$
+        \inner{\chi,\psi}_2 = \inner{a_1\chi_1+\dots+a_n\chi_n,\psi}_2 = \sum_{i=1}^{n}a_i\inner{\chi_i,\psi}_2
+        $$
+        The result follows from Theorem 6.25
+        \item From Theorem 6.25
+        $$
+        \inner{\chi,\chi}_2 = \sum_{i=1}^{n} \inner{a_i\chi_i,a_i\chi_i}_2 = \abs{G}\sum^{n}_{i=1}a^2_i
+        $$
+        Note $a_i$ must be natural numbers, so $\sum^{n}_{i=1}a^2_i=1$ iff $\pi$ is irreducible. \newline
+    \end{itemize}
+\end{myproof}
+
+\begin{corollary}
+    Two representations (matrix representations) of a finite group are equivalent iff they have the same characters.
+\end{corollary}
+\begin{remark}
+    Refer to Def. 6.18, where we said a character is irreducible iff the representation producing it is irreducible. This corollary essentially says the decomposition of any representation from Maschke's theorem is unique, up to reording of terms.
+\end{remark}
+\begin{myproof}
+    Lemma 6.20 shows equivalent representations (matrix representations) have same characters. Now we show the other direction. We prove for matrix representations, but the proof is the same for representations (since Corollary 6.26 and Maschke's theorem applies to representations as well).
+    \begin{itemize}
+        \item Let $\phi,\pi$ be matrix representations of $G$ with characters $\chi,\psi$. Suppose $\chi(g)=\psi(g)$ for all $g\in G$. By Maschke's theorem, 
+        $$
+            \phi \cong a_1\phi_1 \bigoplus \dots \bigoplus a_n\phi_n 
+        $$
+        for some pairwise inequivalent irreducible matrix representations $\phi_i$. Let $\chi_i$ be the character of $\phi_i$. WLOG, we can assume 
+        $$
+        \pi \cong b_1\phi_1 \bigoplus \dots \bigoplus b_n\phi_n
+        $$
+        using 0s as coefficients if an irrep occurs in $\phi$ or $\pi$ and not in both. By Corollary 6.26,
+        $$
+        a_i = \frac{1}{\abs{G}}\inner{\chi,\chi_i}_2 = \frac{1}{\abs{G}}\inner{\psi,\chi_i}_2 = b_i
+        $$
+        for all $i$. Hence $\phi\cong\pi$ \newline
+    \end{itemize}
+\end{myproof}
+
+\begin{lemma}
+    Suppose $\rho\,:\,K\rightarrow GL(V)$ is a representation of $K$ and $\chi_\rho$ is the character. By Lemma 6.17, there exists a basis $\beta$ of $V$ s.t. $X(k)=[\rho(k)]_\beta $ is a unitary matrix for all $k$. In particular, $X(k)^{-1}=\overline{X(k)^T} $. Hence
+    $$
+    \overline{\chi_\rho(k)} = \overline{\tr{X(k)}} = \tr{X(k^{-1})^T} = \tr{X(k^{-1})} = \chi_\rho(k^{-1})
+    $$
+    This gives a simplification on inner products of characters 
+    $$
+    \inner{\psi,\chi}_2 = \sum_{k\in K}\psi(k)\chi(k^{-1})
+    $$
+    \newline
+\end{lemma}
+
+
+
+
+
+\section{Decomposition of the Right Regular Representation}
+Main result: decomposition of the (right) regular representation of $G$ as a direct sum of irreps contains \define{every} irrep of $G$. \newline
+
+\begin{lemma}
+    Group $G$ with right regular representation $R\,:\,G\rightarrow GL(L^2(G))$ by $R(\gamma)f(g)=f(g\gamma)$, character $\chi_R$. Then 
+    $$
+    \chi_R(\gamma) = \left\{
+    \begin{array}{ll}
+        \abs{G} & \gamma = e_G  \\
+        0 & \textrm{otherwise}
+    \end{array}
+    \right.
+    $$
+\end{lemma}
+\begin{myproof}
+    From remark of Def. 1.10, given $G=\{g_1,\dots,g_n\}$, the standard basis of $L^2(G)$ is $\beta=[\delta_{g_1},\dots,\delta_{g_n}] $, where $\delta_{g_i} $ is the indicator function of whether $g=g_i$. With respect to this basis, we define $\chi_R$. Then 
+    $$
+    [R(\gamma)]_\beta = \left([R(\gamma)\delta_{g_1}]_\beta \Big\vert \cdots \Big\vert [R(\gamma)\delta_{g_n}]_\beta \right)
+    $$
+    Let $x,g\in G$, then 
+    \begin{align*}
+        (R(\gamma)\delta_g)(x)=\delta_g(x\gamma)=\delta_{g\gamma^{-1}}(x) 
+    \end{align*}
+    So $R(\gamma)\delta_g=\delta_{g\gamma^{-1}} $. Then, $(g,g)$ the entry not zero iff $\delta_{g\gamma^{-1}}(g) \neq 0 $ iff $g\gamma^{-1} = g $ iff $\gamma=e_G$. Therefore,
+    $$
+    \chi_R(\gamma) = \tr{[R(\gamma)]_\beta} = \sum_{g\in G}\delta_{g\gamma^{-1}}(g) = \left\{
+    \begin{array}{ll}
+        \abs{G} & \gamma = e_G  \\
+        0 & \textrm{otherwise}
+    \end{array}
+    \right.
+    $$
+    \newline
+\end{myproof}
+
+\begin{theorem}
+    Let $G$ be a finite group. Then there are only finitely many irreps of $G$, up to equivalence. Suppose that $V_1,\dots,V_n$ form a complete list of inequivalent irreducible representations of $G$. Let $d_i=dim(V_i)$. Then $L^2(G)$ (right regular representation) is orthogonally equivalent to 
+    $$
+    d_1V_1\bigoplus\cdots\bigoplus d_nV_n
+    $$
+    Moreover, $\abs{G}=d_1^2+\dots+d_n^2$
+\end{theorem}
+\begin{remark}
+    This result essentially states that right regular representation contains all of the irreducible representations of $G$. Also, when we talk about right regular representation, we usually consider the standard inner product. Recall right regular representation is unitary with respect to the standard inner product.
+\end{remark}
+\begin{myproof}
+    Let $\chi_R$ be the character of the right regular representation. Suppose that $W$ is an irreducible representation of $G$ with character $\chi$. Then
+    $$
+    \inner{\chi_R,\chi}_2 = \sum_{g\in G}\chi_R(g)\overline{\chi(g)} = \chi_R(e_G)\overline{\chi(e_G)} = \abs{G}dim(W)
+    $$
+    Since by Lemma 6.29, $\chi_R(g)=0$ for $g\neq e_G$. Thus by Corollary 6.26, $W$ occurs in the decomposition of $L^2(G)$ exactly $dim(W)$ times. Then, there must be finitely many irreps of $G$ (worse case: each irreducible representation has dimension 1, then at most $dim(L^2(G))$ such spaces). Hence $L^2(G)$ is orthogonally equivalent to
+    $$
+    d_1V_1\bigoplus\dots\bigoplus d_nV_n
+    $$
+    Taking the dimensions of both side, we have $\abs{G}=d_1^2+\dots+d_n^2$ (space of dimension $d_i$ appears $d_i$ times).
+\end{myproof}
+\begin{remark}
+    A result from group representation theory: the number of irreducible representations of $G$, up to equivalence, is equal to the number of conjugacy classes of $G$. \newline
+\end{remark}
+
+\begin{corollary}
+    Finite group $G$, $V_1,\dots,V_n$ complete set of inequivalent irreps of $G$. Suppose $V_1$ is the trivial representation of $G$ (that is, $\phi\,:\, G\rightarrow GL(\C)$). Let $d_i=dim(V_i)$. Then $L^2_0(G)$ is orthogonally equivalent to $d_2V_2\bigoplus\dots\bigoplus d_nV_n$. 
+\end{corollary}
+\begin{remark}
+    Recall that $L^2_0(G)$ is used to calculate the second-largest eigenvalue of a Cayley graph. Here we show it corresponds to non-trivial irreducible representations of the group.
+\end{remark}
+\begin{myproof}
+    Suffice to show that $L^2_0(G)^\perp = V_1$. Let $f_0$ be the function that is constant to 1 on $G$. Note
+    $$
+    \C f_0 = \{f\in L^2(G)\,\lvert\,\textrm{$f$is a constant function}\}
+    $$
+    and 
+    $$
+    L^2_0(G) = \{f\in L^2(G)\,\lvert\,\inner{f,f_0}_2=0\}
+    $$
+    So $L^2_0(V)^\perp=\C f_0$, and $L^2(G)=\C f_0\bigoplus L^2_0(V)$. Also, for $f\in \C f_0$ and $\gamma,g\in G$, $(R(\gamma)f)(g) = f(g\gamma) = constant = f(g) $, thus $\C f_0$ corresponds to the trivial representation. Done. \newline
+\end{myproof}
+
+
+
+
+
+\section{Uniqueness of Invariant Inner Product}
+This section shows that there is essentially only one invariant inner product (up to a scalar constant) on an irrep. Recall in Lemma 6.14 we showed that every representation has at least one invariant inner product. \newline
+
+\begin{definition}
+    Let $V$ be a vector space. Let $V^*=\{\phi\,:\,V\rightarrow\C\,\lvert\,\textrm{$\phi$ is linear}\}$, the \define{dual space} of $V$. Define operations on $V^*$ using all vectors in $V$:
+    \begin{itemize}
+        \item Addition: $(\phi_1+\phi_2)(v)=\phi_1(v)+\phi_2(v)$
+        \item Scalar multiplication: $(c\phi)(v)=c\phi(v)$
+    \end{itemize}
+    Dual space $V^*$ is a vector space over $\C$. \newline
+\end{definition}
+
+\begin{definition}
+    Let $V$ be a representation for $G$, $V^*$ be the dual space of $V$. Define an action of $G$ on $V^*$ as follows. For $\phi\in V^*$, define $g\cdot\phi\in V^*$ by $(g\cdot\phi)(v)=\phi(g^{-1}\cdot v) $. With this action, call $V^*$ the dual representation of $V$.
+\end{definition}
+\begin{myproof}
+    To verify that $V^*$ is a representation, suffice to show the action has $g\cdot h\cdot \phi=gh\cdot \phi$ for any $g,h\in G, \phi \in V^*$ (thus the corresponding map is homomorphism). For any $v\in G$
+    $$
+    g\cdot(h\cdot\phi)(v) = h\cdot\phi(g^{-1}\cdot v) = \phi(h^{-1}\cdot g^{-1} \cdot v) = \phi((gh)^{-1}\cdot v) = gh \cdot \phi(v)
+    $$ \newline
+\end{myproof}
+
+\begin{definition}
+    \begin{itemize}
+        \item[]
+        \item Given a $G$-invariant inner product $\inner{\cdot,\cdot}$ on a representation $V$ and $v\in V$, define $H_v\,:\,V\rightarrow\C$ by $H_v(\cdot)=\inner{\cdot,v}$
+        \item Note $H_v$ is linear, so $H_v\in V^*$. Define $H\,:\,V\rightarrow V^*$ by $H(v)=H_v$.
+        \item $A,B$ vector spaces over $\C$, $f\,:\,A\rightarrow B$. $f$ is conjugate-linear (semilinear) if $f(c_1v_1+c_2v_2)=\overline{c_1}f(v_1)+\overline{c_2}f(v_2)$ for all $c_1,c_2\in \C, v_1,v_2\in A$
+        \item[] 
+    \end{itemize}
+\end{definition}
+
+\begin{lemma}
+    The map $H$ is 
+    \begin{itemize}
+        \item bijective
+        \item conjugate-linear
+        \item $G$-invariant
+    \end{itemize}
+\end{lemma}
+\begin{myproof}
+    \begin{itemize}
+        \item[]
+        \item Let $[v_1,\dots,v_n]$ be an orthonormal basis for $V$. Assume $H(v) = H(u)$, then $H_v(w) = H_u(w)$ for any $w\in V$. We have $v=a_1v_1+\dots a_nv_n,\;\;\; u=b_1v_1+\dots+b_nv_n$, so $\overline{a_j}=\inner{v_j,v}=H_v(v_j)=H_u(v_j)=\inner{v_j,u}=\overline{
+        b_j}$ for all $j$, thus $v=u$ injective done.
+        \item For arbitrary $\phi\in V^*$, let $a_j=\phi(v_j)$, let $v=\overline{a_1}v_1+\dots+\overline{a_n}v_n$. Then $H_v(v_j)=\phi(v_j)$ for all $j$. Since two linear maps agree on basis, they agree everywhere, thus $H(v)=H_v=\phi$
+        \item Definition of inner product.
+        \item Note $G$-invariant inner product $\inner{\cdot,\cdot}$. For all $g\in G, v,w\in V$, we have
+        \begin{align*}
+            \inner{g^{-1}\cdot w,v} &= \inner{w,g\cdot v} \\
+            &\textrm{definition of invariant} \\
+            H_v(g^{-1} \cdot w) &= H_{g\cdot v}(w)\\
+            &\textrm{definition of $H_v$} \\
+            (g\cdot H_v)(w) &= H_{g\cdot v}(w) \\
+            &\textrm{since $H_v\in V^*$ and the action defines a representation} \\
+            g\cdot H_v &= H_{g\cdot v} \\
+            g\cdot (H(v)) &= H(g\cdot v)
+        \end{align*}
+        \item[] 
+    \end{itemize}
+\end{myproof}
+
+\begin{definition}
+    Suppose $G$-invariant inner product $\inner{\cdot,\cdot}$, $\inner{\cdot,\cdot}'$ on $V$, define $H,H'$ following Def. 6.34, let $\psi=H^{-1}\circ H' $. Then $\psi$ is a $G$-isomorphism.
+\end{definition}
+\begin{myproof}
+    Bijectivity is trivial. Suffice to show $H^{-1} $ is conjugate-linear and $G$-invariant. \newline 
+    Let $f_1,f_2\in V^*$, let $v_1=H^{-1}(f_1), v_2=H^{-1}(f_2) $, then 
+    \begin{align*}
+        H^{-1}(c_1f_1+c_2f_2) 
+        &= H^{-1}(c_1H(v_1) + c_2H(v_2)) \\
+        &= H^{-1}(H(\overline{c_1}v_1+\overline{c_2}v_2)) \\
+        &= \overline{c_1}v_1+\overline{c_2}v_2 \\
+        &= \overline{c_1}H^{-1}(f_1) + \overline{c_2}H^{-1}(f_2)
+    \end{align*}
+    Conjugate-linear done. Let $f\in V^*,g\in G$, let $t=H^{-1}(f)$ then 
+    $$
+    H^{-1}(g\cdot f) = H^{-1}(g\cdot H(t)) = H^{-1}H(g\cdot t) = g\cdot t = g\cdot H^{-1}(f)
+    $$
+    $G$-invariant done.   \newline
+\end{myproof}
+
+\begin{proposition}
+    Suppose $V$ is an irrep for a finite group $G$, $G$-invariant inner product $\inner{\cdot,\cdot}$, $\inner{\cdot,\cdot}'$ on $V$. Then $\inner{\cdot,\cdot} = C\inner{\cdot,\cdot}'$ for some $C\in \R^{+}$. That is, $\inner{v,w} = C\inner{v,w}'$ for all $v,w\in V$.
+\end{proposition}
+\begin{myproof}
+    
+\end{myproof}
+
+
+
+
+
+\section{Induced Representations}
+\begin{definition}
+    Let $G$ be a finite group and $H\subset G$, $\sigma\,:\,H\rightarrow GL(W)$ be a representation of $H$. Define the vector space 
+    $$
+    V = \{f\,:\,G\rightarrow W\,\lvert\, f(hg)=\sigma(h)f(g) \textrm{ for all $g\in G, h\in H$}\}
+    $$
+    Let $\phi\,:\,G\rightarrow GL(V)$ be defined as $(\phi(x)f)(g)=f(gx)$. The map is the \define{induced representation} from $H$ up to $G$, denoted by $Ind^G_H(\sigma)$.
+\end{definition}
+\begin{myproof}
+    $$
+    (\rho(x)\rho(y)f)(g) = \rho(y)f(gx) = f(gxy) = (\rho(xy)f)(g)
+    $$
+    Homomorphism done, indeed representation.
+\end{myproof}
+\begin{remark}
+    Since $e\in H\subset G$, $f(h)=\sigma(h)f(e)=\sigma(h)$. That is, the induced representation is the same with $\sigma$ on $H$. We are extending the representation of $H$ to get a representation of $G$. \newline
+\end{remark}
+
+\begin{definition}
+Same definitions as Def. 6.38, 
+    \begin{itemize}
+        \item By Lemma 6.14, exists inner product $\inner{\cdot,\cdot}_W$ with respect to which $\sigma$ is unitary. 
+        \item Let $g_1,\dots,g_m$ form a set of representatives for $H\backslash G$ (set of all right coset $Hg$), exists an orthonormal basis $e_1,\dots,e_s$ of $W$ with respect to $\inner{\cdot,\cdot}_W$. 
+        \item Let 
+        $$
+        \tilde{\sigma}(y) = \left\{
+        \begin{array}{ll}
+            \sigma(y) & y\in H  \\
+            0 & y \notin H 
+        \end{array}
+        \right.
+        $$
+        For each $i = 1,\dots, m, j= 1, \dots, s$ define 
+        $$
+        f_{ij}(x)=\tilde{\sigma}(xg^{-1}_i)e_j
+        $$
+    \end{itemize}
+\end{definition}
+\begin{remark}
+    Somehow this is extending an orthonormal basis of $W$ corresponding to $H$ to an orthonormal basis of $V$ corresponding to $G$.
+\end{remark}
+\begin{myproof}
+    Discuss $gg_i^{-1} \in H$ and $gg_i^{-1} \notin H$, easy to show $f_{ij} \in V $.
+\end{myproof}
+\begin{remark}
+    Give $x=hg$, we have $f_{ij}(x) = \sigma(h)\hat{\sigma}(gg^{-1}_i)e_j = \hat{\sigma}(h)\hat{\sigma}(gg^{-1}_i)e_j $ \newline
+\end{remark}
+
+
+\begin{definition}
+    Following previous definitions, 
+    $$
+    \inner{y_1,y_2}_V = \sum^m_{t=1}\inner{y_1(g_t), y_2(g_t) }_W
+    $$
+    is a well-defined $G-$invariant inner product on $V$.
+\end{definition}
+\begin{remark}
+    We extend the $H$-invariant inner product on $W$ to an inner product on $V$, and the extended version is $G$-invariant on $V$ as well.
+\end{remark}
+\begin{myproof}
+    We first show the inner product does not depend on the choice of representatives (hence well-defined). Suppose the other representatives of $H\backslash G$ is $g'_1,\dots,g'_m$, then $h_1g'_1=g_1, \dots, h_mg'_m=g_m$ for some $h_i\in H$. Let $y_1,y_2\in V$, then 
+    \begin{align*}
+        \sum^m_{t=1}\inner{y_1(g_t), y_2(g_t) }_W 
+        &= \sum^m_{t=1}\inner{y_1(h_tg'_t), y_2(h_tg'_t) }_W \\
+        &= \sum^m_{t=1}\inner{\sigma(h_t)y_1(g'_t),\sigma(h_t)y_2(g'_t) }_W \\
+        &= \sum^m_{t=1}\inner{y_1(g'_t),y_2(g'_t) }_W
+    \end{align*}
+    Since $\sigma$ is unitary with respect to $\inner{\cdot,\cdot}_W$. $\inner{\cdot,\cdot}_V$ is obviously an inner product. \newline
+
+    We now show $\inner{\cdot,\cdot}_V$ is $G$-invariant. Let $f_1,f_2\in V$. Let $x=hg\in G$. For each $t$, $g_tx=g_thg=h_t\hat{g}_t$ for some $h_t\in H, \hat{g}_t\in \{g_1,\dots,g_m\}$, since $g_thg$ is also an element of $G$. Then
+    \begin{align*}
+        \hat{g}_{t_1} &= \hat{g}_{t_2} \\
+        h^{-1}_{t_1}_tg_{t_1}hg &= h^{-1}_{t_2}_tg_{t_2}hg \\
+        h_{t_2}h^{-1}_{t_1}_tg_{t_1} &= g_{t_2} \\
+        g_{t_1} &= g_{t_2} \\
+    \end{align*}
+    since $g_t$ are representatives of cosets. That is, $\hat{g}_{t_1}=\hat{g}_{t_1}$ iff $t_1=t_2$, there is a bijection between $g_t$ and $\hat{g}_t$, summing over all $g_t$ is equivalent to summing over all $\hat{g}_t$. So
+    \begin{align*}
+        \inner{\rho(x)f_1, \rho(x)f_2}_V 
+        &= \sum_{t=1}^m\inner{\rho(x)f_1(g_t), \rho(x)f_2(g_t)}_W \\
+        &= \sum_{t=1}^m\inner{f_1(g_tx),f_2(g_tx)}_W = \sum_{t=1}^m\inner{\sigma(h_t)f_1(\hat{g}_t),\sigma(h_t)f_2(\hat{g}_t)}_W \\
+        &= \sum_{t=1}\inner{f_1(g_t),f_2(g_t)}_W = \inner{f_1,f_2}_V
+    \end{align*}
+    \newline
+\end{myproof}
+
+\begin{lemma}
+    The functions $f_{ij} $ form an orthonormal basis for $V$.
+\end{lemma}
+\begin{remark}
+    Since $i=1,\dots,m$ is the number of right coset representatives of $H\backslash G$, $j=1,\dots, s$ corresponds to an orthonormal basis of $W$, we have $dim(V)=dim(W)[G:H]$.
+\end{remark}
+\begin{myproof}
+    Note $\tilde{\sigma}(g_ag_b^{-1}) \neq 0$ iff $g_ag_b^{-1}\in H$ iff $a=b$, since $g_t$ are representatives of cosets. Suppose $1\le i, k\le m, 1\le j, r\le s$, then 
+    \begin{align*}
+        \inner{f_{ij},f_{kr}}_V 
+        &= \sum^{m}_{t=1}\inner{f_{ij}(g_t),f_{kr}(g_t)}_W \\
+        &= \sum^{m}_{t=1}\inner{\tilde{\sigma}(g_tg^{-1}_i)e_j,\tilde{\sigma}(g_tg^{-1}_k)e_r }_W \\
+        &= \left\{ 
+        \begin{array}{ll}
+            1 & i=k,\, j=r  \\
+            0 & \textrm{otherwise}
+        \end{array}
+        \right.
+    \end{align*}
+    Hence, $f_{ij} $ are mutually orthogonal and are each of norm 1, thus they form a linearly independent set in $V$. Suffice to show they also span $V$. \newline 
+
+    Let $f\in V, x=hg_r\in G$. Recall in Def. 6.39, $e_1,\dots,e_s$ is an orthonormal basis of $W$, $V$ is the vector space of function from $G$ to $W$. Suppose $f(g_r)=c_1e_1+\dots+c_se_s$, then $\inner{f(g_r),e_1}_W=c_1$ since this is a set of orthonormal basis. Note $f_{ij}(x) = \tilde{\sigma}(hg_rg^{-1}_i)e_j$, which simplifies to $\sigma(h)e_j$ if $i=r$, or to 0 if $i\neq r$. Thus,
+    \begin{align*}
+        f(x) &= \sigma(h)f(g_r) = c_1\sigma(h)e_1 + \dots + c_s\sigma(h)e_s \\
+        &= \inner{f(g_r),e_1}_W\sigma(h)e_1 + \dots + \inner{f(g_r),e_s}_W\sigma(h)e_s \\
+        &= \inner{f(g_r),e_1}_Wf_{r1}(x) + \dots + \inner{f(g_r),e_s}_Wf_{rs}(x) \\
+        &= \sum_{b=1}^{s}\inner{f(g_r),e_b}_Wf_{rb}(x)
+    \end{align*}
+    Hence 
+    $$
+    f = \sum_{a=1}^m\sum^s_{b=1}\inner{f(g_a),e_b}_Wf_{ab}
+    $$
+    since with $x=hg_t$, for $r\neq t$, $\sum_{b=1}^{s}\inner{f(g_r),e_b}_Wf_{rb}=0$. That is, $f_{ij} $ span $V$. \newline
+\end{myproof}
+
+\begin{proposition}
+    Let $G,H,\sigma,V,\rho=Ind^G_H(\sigma)$ be defined as before, let 
+    $$
+    \tilde{\chi}_\sigma(x) = \left\{
+    \begin{array}{ll}
+        \chi_\sigma(x) & x\in H \\
+        0 & x \notin H 
+    \end{array}
+    \right.
+    $$
+    where $\chi_\sigma$ is the character of $\sigma$. Let $\chi_\rho$ be the character of $\rho$. Then 
+    $$
+    \chi_\rho(g) = \frac{1}{\abs{H}}\sum_{x\in G}\tilde{\chi}_\sigma(xgx^{-1})
+    $$
+\end{proposition}
+\begin{remark}
+    Finally, we extend the character for the representation of $H$ to the character for the representation of $G$, and we are ready to build connection between these two representations using the close relation between character and representation.
+\end{remark}
+\begin{myproof}
+    Let $x\in G$, then $x=hg_k$ for some $h\in H, 1\le k\le m$. Then 
+    $$
+    (\rho(g)f_{ij})(x) = f_{ij}(hg_kg) = \tilde{\sigma}(h)\tilde{\sigma}(g_kgg^{-1}_i)e_j
+    $$
+    Denote the orthonormal basis $[e_1,\dots,e_s] $ as $\beta_W$, let 
+    $$
+    [\tilde{\sigma}(x)]_{\beta_W} = \left(
+    \begin{array}{ccc}
+        \tilde{\sigma}_{11}(x) & \cdots & \tilde{\sigma}_{1s}(x)  \\
+        \vdots & \ddots & \vdots \\ 
+        \tilde{\sigma}_{s1}(x) & \cdots & \tilde{\sigma}_{ss}(x)
+    \end{array}
+    \right)
+    $$
+    That is, we defined coordinate functions for the matrix form of $\tilde{\sigma}$, and we have $\tilde{\sigma}(x)e_j=\sum^s_{r=1}\tilde{\sigma}_{rj}(x)e_r $. That is, $\tilde{\sigma}(x)$ acts on $e_j$ is the $j$th column of the above matrix, exactly how we get the matrix form with respect to this basis. \newline 
+
+    Since $h=xg^{-1}_k $, we have 
+    $$
+    (\rho(g)f_{ij})(x) = \tilde{\sigma}(h)\sum^{s}_{r=1}\tilde{\sigma}_{rj}(g_kgg^{-1}_i)e_r = \sum^s_{r=1}\tilde{\sigma}_{rj}(g_kgg^{-1}_i)\tilde{\sigma}(xg^{-1}_k)e_r = \sum^s_{r=1}\tilde{\sigma}_{rj}(g_kgg^{-1}_i)f_{kr}(x)
+    $$
+    Note $f_{ar}(x) = \tilde{\sigma}(hg_kg^{-1}_a)e_r\neq 0 $ iff $a=k$, hence 
+    $$
+    \rho(g)f_{ij} = \sum^m_{a=1}\sum^s_{r=1}\tilde{\sigma}_{rj}(g_agg^{-1}_i)f_{ar}
+    $$
+    Let $\beta_V$ be the ordered basis $[f_{11}, \dots, f_{1s}, f_{21}, \dots, f_{2s}, \dots, f_{m1}, \dots, f_{ms} ] $, then 
+    $$
+    [\rho(g)]_{\beta_V} = \left(
+    \begin{array}{ccc}
+        [\tilde{\sigma}(g_1gg^{-1}_1)]_{\beta_W} & \cdots & [\tilde{\sigma}(g_1gg^{-1}_m)]_{\beta_W}  \\
+        \vdots & \ddots & \vdots \\\relax %to avoid error
+        [\tilde{\sigma}(g_m gg^{-1}_1)]_{\beta_W} & \cdots &[\tilde{\sigma}(g_mgg^{-1}_m)]_{\beta_W} 
+    \end{array}
+    \right)
+    $$
+    The matrix is written in block form, with each block as what we defined above for $W$. For example, $\rho(g)f_{11} $ corresponds to the first column of this matrix. With this matrix, we have 
+    $$
+    \tr{[\rho(g)]_{\beta_V}} = \sum^m_{r=1}\tr{\tilde{\sigma}(g_rgg^{-1}_r)} = \sum^m_{r=1}\tilde{\chi}_\sigma(g_rgg^{-1}_r)
+    $$
+    Since $\tilde{\chi}_\sigma(t)=0$ iff $t\notin H$ iff $\tilde{\sigma}(t)=0$. With $x=hg_r$, $\tilde{\chi}_\sigma(g_rgg^{-1}_r)= \tilde{\chi}_\sigma(hg_rgg^{-1}_rh^{-1}) = \tilde{\chi}_{\sigma}(xgx^{-1})$ (same character under conjugation), thus 
+    $$
+    \abs{H}\sum^m_{r=1}\tilde{\chi}_\sigma(g_rgg^{-1}_r) = \sum_{x\in G}\tilde{\chi}_\sigma(xgx^{-1})
+    $$
+    On the RHS, we sum over $G$, correspondingly we sum each representative $g_r$ $\abs{H}$ times. Hence,
+    $$
+    \chi_\rho(g) = \tr{[\rho(g)]_{\beta_V}} = \frac{1}{\abs{H}}\sum_{x\in G}\tilde{\chi}_\sigma(xgx^{-1})
+    $$\newline
+\end{myproof}
+
+\begin{definition}
+    Finite group $G$, $H\subset G$. Let $\phi\,:\, G\rightarrow GL(V)$ be a representation of $G$. Define the \define{restriction} of $\phi$ to $H$ as the representation $Res^G_H(\phi)\,:\,H\rightarrow GL(V)$, where $Res^G_H(\phi)(h)=\phi(h)$ for all $h\in H$. \newline
+\end{definition}
+
+\begin{theorem}
+    (Frobenius Reciprocity)\newline
+    Finite group $G$, $H\subset G$, $\sigma\,:\,H\rightarrow GL(V_1)$, $\phi\,:\,G\rightarrow GL(V_2)$ two representations. Let $\phi=Ind^G_H(\sigma), \tau=Res^G_H(\phi)$, then 
+    $$
+    \frac{1}{\abs{G}}\inner{\chi_\rho, \chi_\phi}_2 = \frac{1}{\abs{H}}\inner{\chi_\sigma,\chi_\tau}_2
+    $$
+    where both inner products are standard. 
+\end{theorem}
+\begin{myproof}
+By Prop. 6.42, and the fact that character is constant on conjugacy class (Lemma 6.20)
+    \begin{align*}
+        \frac{1}{\abs{G}}\inner{\chi_\rho, \chi_\phi}_2 
+        &= \frac{1}{\abs{G}\abs{H}}\sum_{g\in G}\sum_{x\in G}\tilde{\chi}_\sigma(xgx^{-1})\overline{\chi_\phi(g)} \\
+        &= \frac{1}{\abs{G}\abs{H}}\sum_{g\in G}\sum_{x\in G}\tilde{\chi}_\sigma(xgx^{-1})\overline{\chi_\phi(xgx^{-1})} \\
+        &=  \frac{1}{\abs{G}\abs{H}}\sum_{x\in G}\sum_{y\in G}\tilde{\chi}_\sigma(y)\overline{\chi_\phi(y)} \\
+        &= \frac{1}{\abs{H}}\sum_{y\in G}\tilde{\chi}_\sigma(y)\overline{\chi_\phi(y)} \\
+        &= \frac{1}{\abs{H}}\sum_{h\in H}\chi_\sigma(h)\overline{\chi_\tau(h)} \\
+        &\textrm{since $\tilde{\chi}_\sigma$ is 0 if not in $H$} \\
+        &= \frac{1}{\abs{H}}\inner{\chi_\sigma,\chi_\tau}_2
+    \end{align*}
+    \newline 
+\end{myproof}
+
+\begin{remark}
+    Main usage of this result is to check which irreps appear in the direct sum decomposition of the induced representation. 
+\end{remark}
+\begin{example}
+    $H\subset G$, suppose exists $\sigma$ as a nontrivial irrep of $H$. Let $\rho=Ind^G_H(\sigma)$, 1 be ``the" trivial representation of $G$ (hence ``the" trivial representation of $H$). Since 1 is always an irrep and not equivalent to $\sigma$, we have $\inner{1,\chi_\sigma}=0$ (by Theorem 6.25). Then, by Frobenius Reciprocity,
+    $$
+    \frac{1}{\abs{G}}\inner{1,\chi_\rho} = \frac{1}{\abs{H}}\inner{1,\chi_\sigma}=0
+    $$
+    Hence, by Corollary 6.26, the trivial representation cannot appear in the direct sum decomposition of $\rho$.
+\end{example}
+
+
+
+
+\end{document}
