@@ -1,0 +1,615 @@
+\documentclass{book}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{graphicx} % Required for inserting images
+\usepackage{amsmath} % basic math stuff, also aligned environment 
+\usepackage{amsfonts} % defeines blackboard bold fonts for \Z, \R
+\usepackage{tikz} % Drawing environment 
+\usepackage{amsthm} % AMS theorem defining stuff
+\usepackage{amssymb} % good looking empty set
+\usepackage{leftindex} % left superscript
+\usepackage{float} % picture position
+\usepackage{scalerel} % parallel for subscript
+\usepackage{booktabs} %toprule, midrule
+
+% Formating stuff
+\usepackage{hyphenat} % forbid use of hyphen
+%complete elimination of hyphen 
+\righthyphenmin = 100
+\lefthyphenmin = 100
+%取消段前空格
+\setlength{\parindent}{0pt}
+
+% Makes section headings and cross references act like links
+\usepackage[colorlinks,unicode]{hyperref}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Create simple shortcut commands.  Almost everyone who uses LaTeX
+% creates commands like thes.
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\F}{\mathbb{F}}
+
+% this is to highlight words that are being defined and enter.
+\newcommand{\define}[1]{\textbf{#1}}
+
+% Symmetric inclusion symbol 
+\newcommand{\syin}{$\subset$\kern-0.48em\raisebox{.20ex}{\tiny S}$\,$}
+%\kern 左右移动(-为向左)，\raisebox 上下移动(-为向下)
+% Note this symbol does not work in math mode.
+
+% Zig-Zag product symbol 
+\newcommand{\zigzag}{$\bigcirc$\kern-0.77em\raisebox{-.16ex}{\small Z}$\,$}
+%\kern 左右移动(-为向左)，\raisebox 上下移动(-为向下)
+% Note this symbol does not work in math mode.
+
+% diam
+\newcommand{\diam}[1]{\textrm{diam}( #1 )}
+% inner product 
+\newcommand{\inner}[1]{\langle #1 \rangle}
+% norm 
+\newcommand{\norm}[1]{\lVert #1 \rVert}
+% dist
+\newcommand{\dist}[1]{\textrm{dist}( #1 )}
+% absolute value 
+\newcommand{\abs}[1]{\lvert #1 \rvert }
+% Cayley graph 
+\newcommand{\Cay}[1]{\textrm{Cay}( #1 )}
+% Cos graph
+\newcommand{\Cos}[1]{\textrm{Cos}( #1 )}
+% Automorphism group 
+\newcommand{\Aut}[1]{\textrm{Aut}( #1 )}
+% multiplicity of edges
+\newcommand{\mul}[1]{\textrm{mul}( #1 )}
+% trace of matrix
+\newcommand{\tr}[1]{\textrm{tr}( #1 )}
+% trace of matrix
+\newcommand{\Mod}[1]{\;(\textrm{mod } #1 )}
+
+
+% 简写section title
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% The next page or two of stuff is devoted to creating and
+% manipulating the environments for lemma, proof, example, etc.
+% The first part is pretty simple, and almost everyone has commands
+% like this in every paper, article, book, etc.  
+% 
+% We start with things like lemmas, theorems, etc.
+
+%注释
+%\newtheorem{env name}{text}[parent counter]
+%\newtheorem{env name}[shared counter]{text}
+%parent counter: numbering will resteart whenever that sectional level is encountered
+%shared counter: if specificed, numbering will progress sequentially for 
+%all theorem element using this counter
+
+\theoremstyle{definition} 
+%adds extra space above and below, but sets the text in roman
+%recommended for definitions, conditions, problems, and examples
+
+\newtheorem{lemma}{Lemma}[chapter]
+\newtheorem{proposition}[lemma]{Proposition}
+\newtheorem{theorem}[lemma]{Theorem}
+\newtheorem{corollary}[lemma]{Corollary}
+\newtheorem{definition}[lemma]{Definition}
+
+%自定义新的theorem environment
+\newtheoremstyle{remarkstyle}
+    {\topsep}%   space above, empty for `usual value'
+    {\topsep}%   space below
+    {}%          body font, input \itshape for italian
+    {}%          indent amount 
+    {}%          thm head font 
+    {}%          Punctuation after thm head
+    {\newline}%  Space after thm head: \newline = linebreak
+    {}%          Thm head spec
+\theoremstyle{remarkstyle}
+\newtheorem*{remark}{Remark}%[chapter] 
+\newtheorem*{example}{Example}%[chapter]
+\newtheorem*{myproof}{Proof}%[chapter]
+%this formating (* and %[chapter]) elminates numbering for theorem environment
+
+%theorem之间的空间是手动调的，在最后加个\newline或者item[]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% The stuff that follows is a bit tricky, and is well more than most
+% people do with LaTeX.  The basic idea is that I want to be able to
+% show only examples, or only definitions, or hide only proofs, etc.  
+
+
+\makeatletter
+% the following key values give the set up for hiding certain
+% environemnts. Note that "true" is just a dummy value.  It would work
+% equally well with "foo".  Each one of these redefines the outer
+% environment for an atom to turn the whole thing into a hidden
+% comment.  Note that the environments theorem, example, etc. do not
+% have to be written in any special way for hide and show to work.
+% They get clobbered by hide.  
+  \define@key{hide}{lemma}[true]{\renewenvironment{lemma}{\comment}{\endcomment}}
+  \define@key{hide}{comments}[true]{\renewenvironment{comments}{\comment}{\endcomment}}
+  \define@key{hide}{corollary}[true]{\renewenvironment{corollary}{\comment}{\endcomment}}
+  \define@key{hide}{definition}[true]{\renewenvironment{definition}{\comment}{\endcomment}}
+  \define@key{hide}{example}[true]{\renewenvironment{example}{\comment}{\endcomment}}
+  \define@key{hide}{proposition}[true]{\renewenvironment{proposition}{\comment}{\endcomment}}
+  \define@key{hide}{theorem}[true]{\renewenvironment{theorem}{\comment}{\endcomment}}
+  \define@key{hide}{remark}[true]{\renewenvironment{remark}{\comment}{\endcomment}}
+  \define@key{hide}{myproof}[true]{\renewenvironment{myproof}{\comment}{\endcomment}}
+% Now this command can be given a comma separated list of names to
+% hide.  Thus, \HideEnvirons{ example, proof} would hide all examples
+% and proofs.
+\newcommand{\HideEnvirons}[1]{\setkeys{hide}{#1}}
+
+
+% The \ShowEnvirons command works like this: if it's argument is foo,
+% it redefines the *hide* family key for foo to do nothing.  Then, it
+% issues a \HideEnvirons command containing a list of all the atom
+% types.  So, everything is hidden *unless* the hide-family key has
+% been redefinied.
+  \define@key{show}{lemma}[true]{\define@key{hide}{lemma}{}}
+  \define@key{show}{comments}[true]{\define@key{hide}{comments}{}}
+  \define@key{show}{corollary}[true]{\define@key{hide}{corollary}{}}
+  \define@key{show}{definition}[true]{\define@key{hide}{definition}{}}
+  \define@key{show}{example}[true]{\define@key{hide}{example}{}}
+  \define@key{show}{proposition}[true]{\define@key{hide}{proposition}{}} 
+  \define@key{show}{theorem}[true]{\define@key{hide}{theorem}{}}
+  \define@key{show}{remark}[true]{\define@key{hide}{remark}{}}
+  \define@key{show}{myproof}[true]{\define@key{hide}{myproof}{}}
+% This command can be given a comma separated list of names to show,
+% and only these will be shown.  Thus,
+% \ShowEnvirons{example,definition} will show only examples and definitions.
+\newcommand{\ShowEnvirons}[1]
+{\setkeys{show}{#1}\HideEnvirons{%
+    comments,
+    corollary,
+    definition,
+    example,
+    proposition,
+    theorem,
+    lemma,
+    remark,
+    myproof
+  }}
+\makeatother
+
+% Comment out the next line to see the full text
+\ShowEnvirons{definition, proposition, theorem, remark, example, lemma, myproof, corollary}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+\setcounter{chapter}{6}
+\chapter{Representation and Eigenvalues}
+% Tips facing very long chapter titles 
+% \chapter[medium-length title for Table of contents, if wanted]{full title name}
+% \chaptermark{short title for running headers}
+This chapter wants to bound the eigenvalues of Cayley graphs. \newline
+
+
+
+\section{Decompose Adjacency Operator}
+Consider a Cayley graph $\Cay{G,\Gamma}$ with adjacency operator $A$, let $f\in L^2(G)$, and let $R$ be the right regular representation of $G$. Then
+$$
+(Af)(x) = \sum_{\gamma\in\Gamma}f(x\gamma) = \sum_{\gamma\in \Gamma}(R(\gamma)f)(x)
+$$
+So we have $A=\sum_{\gamma\in\Gamma}R(\gamma) $ \newline
+
+\begin{proposition}
+    Finite group $G$, $\Gamma$\syin$G$, adjacency operator $A$ of $\Cay{G,\Gamma}$. If $\pi_1,\dots,\pi_k$ is a complete set of inequivalent matrix irreps of $G$, then 
+    $$
+    A \cong d_1M_{\pi_1} \bigoplus \cdots \bigoplus d_kM_{\pi_k}
+    $$
+    where $d_i=dim(\pi_i), M_{\pi}=\sum_{\gamma\in\Gamma}\pi(\gamma) $
+\end{proposition}
+\begin{myproof}
+    By Theorem 6.30 and the fact above, 
+    $$
+    A = \sum_{\gamma\in\Gamma}R(\gamma) \cong \sum_{\gamma\in\Gamma}(d_1\pi_1(\gamma)\bigoplus\dots\bigoplus d_k\pi_k(\gamma))
+    $$
+    \newline
+\end{myproof}
+
+\begin{corollary}
+    Group $G$, $\Gamma,\Gamma'$\syin$G$ s.t. $\Gamma\subset\Gamma'$. Let $X=\Cay{G,\Gamma},X'=\Cay{G,\Gamma'}$. Then $\abs{\Gamma}-\lambda_1(X)\le \abs{\Gamma'}-\lambda_1(X')$.
+\end{corollary}
+\begin{remark}
+    That is, increasing the size of $\Gamma$ would never decrease the spectral gap.
+\end{remark}
+\begin{myproof}
+    Let $A,A'$ be adjacency operators for $X,X'$. If $f\in L^2(G)$ with $\norm{f}_2=1$, then by Cauchy and the fact that $R$ is unitary w.r.t. the standard inner product,
+    $$
+    \abs{\inner{R(\gamma)f,f}_2}\le \norm{R(\gamma)f}_2\norm{f}_2 = \norm{f}_2^2 = 1
+    $$
+    for all $\gamma\in\Gamma$. \newline 
+
+    Suppose $\gamma=\gamma^{-1} $, 
+    $$
+    \inner{R(\gamma)f,f}_2=\inner{R(\gamma^{-1})R(\gamma)f,R(\gamma^{-1})f}_2 = \inner{f,R(\gamma)f}_2 = \overline{\inner{R(\gamma)f,f}_2} 
+    $$
+    so $\inner{R(\gamma)f,f}_2$ is real. \newline
+    
+    For any $\gamma$, 
+    $$
+    \inner{R(\gamma)f,f}_2 + \inner{R(\gamma^{-1})f,f}_2 = \inner{f,R(\gamma^{-1})f}_2 + \inner{f,R(\gamma)f}_2 = \overline{\inner{R(\gamma)f,f}_2 + \inner{R(\gamma^{-1})f,f}_2}
+    $$
+    so $\inner{R(\gamma)f,f}_2 + \inner{R(\gamma^{-1})f,f}_2$ is real. \newline 
+
+    Let $f$ as defined above, 
+    \begin{align*}
+        \abs{\Gamma}-\inner{Af,f}_2 
+        &= \abs{\Gamma} - \sum_{\gamma\in\Gamma}\inner{R(\gamma)f,f}_2 = \sum_{\gamma\in\Gamma}(1-\inner{R(\gamma)f,f}_2) \\
+        &\le \sum_{\gamma'\in\Gamma'}(1-\inner{R(\gamma')f,f}_2) = \abs{\Gamma'} - \sum_{\gamma'\in\Gamma'}\inner{R(\gamma')f,f}_2 \\
+        &= \abs{\Gamma'}-\inner{A'f,f}_2
+    \end{align*}
+    The inequality relies on $\abs{\inner{R(\gamma)f,f}_2}\le1$, and each new element of $\Gamma'$ would contribute a real number in the summation (either one to one, or a pair of elements contributing one). Then, by Rayleigh Ritz, choose $f$ s.t. $\lambda_1(X')=\inner{A'f,f}$ and $\norm{f}_2=1$ 
+    $$
+    \abs{\Gamma}-\lambda_1(X) \le \abs{\Gamma}-\inner{Af,f} \le \abs{\Gamma'}-\inner{A'f,f} = \abs{\Gamma'}-\lambda_1(X')
+    $$
+    Note two graph share the same vertex set, thus same $L^2(G)$. \newline
+\end{myproof}
+
+
+
+
+
+\section{Unions of Conjugacy Classes}
+This section discusses how to find the eigenvalues when $\Gamma$ is a union of conjugacy classes. \newline 
+
+\begin{proposition}
+    Finite group $G$, $\Gamma$\syin$G$ s.t. $g\Gamma g^{-1} = \Gamma $ for all $g\in G$. Let $X=\Cay{G,\Gamma}$, adjacency operator $A$. Let $\rho_1,\dots,\rho_r$ be a complete set of inequivalent irreps of $G$, let $\chi_i$ be the character of $\rho_i$, $d_i$ the degree of $\rho_i$. Then the eigenvalues of $A$ are given by 
+    $$
+    \mu_i = \frac{1}{d_i}\sum_{\gamma\in\Gamma}\chi_i(\gamma)
+    $$
+    for $i=1,\dots,r$, where each eigenvalue $\mu_i$ occurs with multiplicity $d^2_i$
+\end{proposition}
+\begin{remark}
+    It is possible that $\mu_i=\mu_j$ for $i\neq j$. Therefore, we should combine multiplicities when two $\mu$ overlaps. That is, $\mu_i$ occurs with multiplicity $\sum d^2_j$, where $j$ is s.t. $\mu_i=\mu_j$
+\end{remark}
+\begin{myproof}
+    By Theorem 6.30, we can decompose $L^2(G) = \bigoplus^r_{i=1}d_iV_i $ where $V_1,\dots,V_r$ corresponds to a complete list of inequivalent irreps of $G$, and $R(\gamma)v_i=\rho_i(\gamma)v_i$ for all $v_i\in V_i$ (invariant subspace). Therefore, the restriction of $R(\gamma)$ to $V_i$ is $\rho_i(\gamma)$ \newline 
+
+    Since $\Gamma$ is closed under conjugation, we have 
+    $$
+    AR(g) = \sum_{\gamma\in\Gamma}R(\gamma)R(g) = \sum_{\gamma\in\Gamma}R(\gamma g) = \sum_{\gamma\in\Gamma}R((g\gamma g^{-1})g) = \sum_{\gamma\in\Gamma}R(g\gamma) = R(g)A
+    $$
+    for all $g\in G$ \newline 
+
+    Fix $i$, consider the restriction of $R$ and $A$ to $V_i$. Since $A=\sum_{\gamma\in\Gamma}R(\gamma) $ and $R\,:\,V_i\rightarrow V_i$, we have $A\,:\,V_i\rightarrow V_i$. Pick basis $\beta$ of $V_i$, then $[R(g)]_\beta[A]_\beta = [A]_\beta[R(g)]_\beta $ for all $g\in G$. Since $R$ restricted to $V_i$ is the irreducible representation $\rho_i$, and we are dealing with matrix representations, by Corollary 6.23, $[A]_\beta = \mu_iI$, where $I$ is the $d_i\times d_i $ identity matrix and $\mu_i\in \C$. Consider the trace of the matrix representation of $A$ restricted to $V_i$ w.r.t. basis $\beta$, denote this thing as $[A\lvert_{V_i}]_\beta $, we have
+    $$
+    d_i\mu_i = \tr{[A\lvert_{V_i}]_\beta} = \tr{\sum_{\gamma\in\Gamma}[\rho_i(\gamma)]_\beta} = \sum_{\gamma\in\Gamma}\chi_i(\gamma)
+    $$
+    Thus, $\mu_i=\frac{1}{d_i}\sum_{\gamma\in\Gamma}\chi_i(\gamma) $ \newline 
+
+    Repeat the process for each $i$, and choose bases for each $V_i$ carefully s.t. they can form a basis for $L^2(G)$, then we can see 
+    $$
+    A \cong d_1(\mu_1I_{d_1}) \bigoplus\cdots \bigoplus d_r(\mu_rI_{d_r})
+    $$
+    Recall the notation, where $d_1(\mu_1I_{d_1})$ means $d_1$ copies of $(\mu_1I_{d_1})$ direct summed together. Therefore, the eigenvalues of $A$ are $\mu_1,\dots,\mu_r$, where $\mu_i$ has multiplicity $d^2_i$. \newline 
+\end{myproof}
+
+\begin{remark}
+    Group $G$, $\Gamma$\syin$G$ s.t. $\Gamma=\bigcup^n_{i=1}K_{g_i} $ for $g_1,\dots,g_n\in G$, where $K_{g_i} $ is the conjugacy class of $g_i$. Since characters are constant on conjugacy classes,
+    $$
+    \mu_i = \frac{1}{d_i}\sum_{\gamma\in\Gamma}\chi_i(\gamma) = \frac{1}{d_i}\sum_{j=1}^n\sum_{h\in K_{g_j}}\chi_i(h) = \frac{1}{d_i}\sum_{j=1}^n\abs{K_{g_j}}\chi_i(g_j)
+    $$
+    \newline 
+\end{remark}
+
+
+
+
+
+\section{An Upper Bound on $\lambda(X)$}
+\begin{proposition}
+    Finite group $G$, $\Gamma$\syin$G$, $X=\Cay{G,\Gamma}$, assume $X$ is non-bipartite. Let $\chi_1,\dots,\chi_r$ be a complete list of irreducible, inequivalent, nontrivial characters of $G$. Let $d_i$ be the degree of $chi_i$. For any positive integer $m$, we have 
+    $$
+    \lambda(X) \le \left(
+    \sum^r_{k=1}d_k\sum_{g\in G}N_g\chi_k(g)
+    \right)
+    $$
+    where $N_g$ is the number of ways to express $g$ as a product of $2m$ elements (not necessarily distinct) elements of $\Gamma$.
+\end{proposition}
+\begin{remark}
+    $\lambda(X)$ here is any eigenvalue of $X$.
+\end{remark}
+\begin{myproof}
+    Let $d=\abs{\Gamma}, n=\abs{X}$, $\pi_i$ be irreducible matrix representation corresponding to $\chi_i$. By Prop. 7.1, and since the right regular representation collects all irreducible representations,
+    $$
+    A \cong (d)\bigoplus d_1M_{\pi_1} \bigoplus \cdots \bigoplus d_rM_{\pi_r}
+    $$
+    where $M_{\pi_i} = \sum_{\gamma\in\Gamma}\pi_i(\gamma) $. The first component corresponds to "the" trivial representation (which is irreducible and of degree 1), is a $1\times 1$ matrix with entry $d$. The remaining eigenvalues lie in these nontrivial irreps. Since $X$ is non-bipartite, $-d$ does not occur as an eigenvalue. \newline
+
+    Let 
+    $$
+    \hat{A} = d_1M_{\pi_1} \bigoplus \cdots \bigoplus d_rM_{\pi_r} 
+    $$
+    be the nontrivial part of $A$
+\end{myproof}
+
+
+
+
+\section{Eigenvalues: Dihedral Groups}
+Here we discuss the case when $n$ is even for dihedral group $D_n$. Recall the dihedral group is given by 
+$$
+D_n = \{1, r, \dots, r^{n-1}, s, sr, \dots, sr^{n-1}\}
+$$
+where $r^n=1,s^2=1,rs=sr^{-1}$, which implies $r^is=sr^{-i} $. \newline 
+
+\begin{proposition}
+    If $n$ is even, then a complete list of inequivalent, irreducible matrix representations of the dihedral group $D_n$ is given as follows.
+    \begin{itemize}
+        \item 4 matrix representations of degree 1
+        $$
+        \begin{array}{cccc}
+           & \vline & r^k & sr^k  \\
+        \hline
+        \psi_1 & \vline & 1 & 1 \\
+        \psi_2 & \vline & 1 & -1 \\
+        \psi_3 & \vline & (-1)^k & (-1)^k \\
+        \psi_4 & \vline & (-1)^k & (-1)^{k+1} \\
+        \end{array}
+        $$
+        \item $\frac{n}{2}-1$ matrix representations of degree 2
+        $$
+        \pi_h(r^k) = \left(\begin{array}{cc}
+           \xi^{hk} & 0  \\
+            0 & \xi^{-hk}  
+        \end{array}\right), \;\;\;
+        \pi_h(sr^k) = \left(\begin{array}{cc}
+            0 & \xi^{-hk}  \\
+            \xi^{hk} & 0  
+        \end{array}\right)
+        $$
+        where $h$ is an integer with $1\le h\le \frac{n}{2}-1$ and $\xi = e^{2\pi i/n} $
+    \end{itemize}
+\end{proposition}
+\begin{myproof}
+    It is straightforward to show that these are indeed homomorphisms (hence matrix representations). Also, it is clear that one-dimensional representations are irreducible and inequivalent. \newline 
+
+    Let $\chi_h$ be the character of $\pi_h$. Suppose $1\le h_1\le h_2\le \frac{n}{2}-1$, then 
+    \begin{align*}
+        \inner{\chi_{h_1},\chi_{h_2}}_2 
+        &= \sum^{n-1}_{k=0}\chi_{h_1}(r^k)\overline{\chi_{h_2}(r^k)} + \sum^{n-1}_{k=0}\chi_{h_1}(sr^k)\overline{\chi_{h_2}(sr^k)} \\
+        &= \sum^{n-1}_{k=0}(\xi^{h_1k}+\xi^{-h_1k})(\xi^{-h_2k} + \xi^{h_2k}) \\
+        &= \sum^{n-1}_{k=0}(\xi^{(h_1-h_2)k} + \xi^{(h_1+h_2)k} + \xi^{-(h_1+h_2)k} + \xi^{(h_2-h_1)k} 
+    \end{align*}
+    Since $1\le h_1\le h_2\le \frac{n}{2}-1$, $0<h_1+h_2<n$. Thus, $\xi^{h_1+h_2}\neq 1 $, then 
+    $$
+    \sum^{n-1}_{k=0}\xi^{(h_1+h_2)k} = \frac{\xi^{(h_1+h_2)kn}-1}{\xi^{(h_1+h_2)k}-1} = 0
+    $$
+    Similarly, $\sum^{n-1}_{k=0}\xi^{-(h_1+h_2)k}=0$. Therefore, 
+    $$
+    \inner{\chi_{h_1},\chi_{h_2}}_2 = \sum^{n-1}_{k=0}(\xi^{(h_1-h_2)k} + \xi^{(h_2-h_1)k})
+    $$
+    If $h_1\neq h_2$, then $0<h_2-h_1<n$, so with similar argument, $\sum^{n-1}_{k=0}\xi^{(h_1-h_2)k}=\sum^{n-1}_{k=0}\xi^{(h_2-h_1)k}=0$. Then 
+    $$
+    \inner{\chi_{h_1},\chi_{h_2}}_2 = \left\{
+    \begin{array}{ll}
+        \abs{D_n} & h_1=h_2 \\
+        0 & h_1\neq h_2 
+    \end{array}
+    \right.
+    $$
+    Hence, by Corollary 6.26 and Theorem 6.25, these two-dimensional representations are irreducible and inequivalent. Following the decomposition of Corollary 6.26, and the fact that $4\times 1^2 + (\frac{n}{2}-1)\times 2^2 = 2n$, we have a complete list of inequivalent, irreducible representations of $D_n$. \newline
+\end{myproof}
+
+\begin{corollary}
+    Let $\psi_i,\pi_h$ be as in Prop. 7.5. (even $n$), let $\Gamma$\syin$D_n$. For each $i=0,1,2,3$, let 
+    $$
+    \lambda_{\psi_i} = \sum_{\gamma\in\Gamma}\psi_i(\gamma)
+    $$
+    For each $1\le h\le \frac{n}{2}-1$, define 
+    $$
+    M_h = \sum_{\gamma\in\Gamma}\pi_h(\gamma)
+    $$
+    Let $\lambda_h^{(1)}, \lambda_h^{(2)} $ be the eigenvalues of $M_h$. Then the spectrum of $\Cay{D_n,\Gamma}$ is 
+    $$
+    \{\lambda_{\psi_1}, \dots, \lambda_{\psi_4}, \lambda_1^{(1)},\lambda_1^{(2)}, \dots, \lambda_{n/2-1}^{(1)}, \lambda_{n/2-1}^{(2)} \}
+    $$
+\end{corollary}
+\begin{myproof}
+    This follows from Prop. 7.5. and Prop. 7.1. (i.e. eigenvalue as (eigenvalues from) sum of matrix representations over symmetric multiset).\newline
+\end{myproof}
+
+
+
+
+
+\section{Payley Graphs}
+Recall that a $d$-regular graph is Ramanujan if $\lambda(X)\le2\sqrt{d-1}$. Here $\lambda(X)$ denotes the largest eigenvalue of the graph. For an infinite sequence of Ramanujan graphs with fixed degrees, $h(X_n)\ge \frac{d-\lambda_1(X_n)}{2} \ge\frac{d-2\sqrt{d-1}}{2} > 0 $ (first inequality from chapter 1)(last inequality if $d>3$). So Ramanujan graphs are good candidates for expander family. \newline 
+
+In this section, we construct an infinite sequence of Ramanujan graphs with varying degrees (so not exactly an expander family). One trivial case is $K_n$ of complete graphs (whose spectrum is $n-1$ of multiplicity 1 and $-1$ of multiplicity $n-1$), this section discuss a non-trivial case. \newline 
+
+\begin{definition}
+    For prime $p$, let
+    $$
+    \Z^\times_p = \Z_p \backslash \{0\} \;\;\; \Gamma_p=\{x^2\,\lvert\,x\in\Z^\times_p\}
+    $$
+\end{definition}
+\begin{remark}
+    \begin{itemize}
+        \item[]
+        \item $\Z_p$ is a group defined with addition, while $\Z^\times_p$ is a group defined with multiplication. When we compute $\Gamma$, we use multiplication for $x^2$, although later the Cayley graph is formed with $\Z_p$ where the operation is addition.
+        \item $x^2$ corresponds to at most two elements of $\Z^\times_p$, namely $x$ and $-x$. Suppose otherwise, $a^2\equiv b^2 \Mod{p} $, then $(a-b)(a+b)\equiv 0\Mod{p}$, thus either $a\equiv b\Mod{p}$ or $a\equiv -b\Mod{p}$ since $p$ is prime. However, in general we don't know what these squares are exactly.
+        \item[] 
+    \end{itemize}
+\end{remark}
+
+\begin{lemma}
+    If $p$ is a prime and $p\equiv 1\Mod{4}$, then there exists an $x\in \Z^\times_p$ s.t. $x^2=-1$
+\end{lemma}
+\begin{myproof}
+\begin{itemize}
+    \item[] 
+    \item Since $\Z_p$ is a finite field, we have $\Z^\times_p$ is a cyclic group under multiplication (general result: for finite field $\F$, if $H$ is a finite multiplicative subgroup of $\F^\times$, then $H$ is cyclic). 
+    \item So $\Z^\times_p = \inner{g}$ for some $g\in \Z^\times_p$
+    \item Consider $(x-1)(x+1)=0$ in $\Z_p$. Clearly $0$ is not the solution, so the solution lies in $\Z^\times_p$. Following discussions in the remark, only solutions are $x=1,-1$. Since $g^0=1$ and $g^{(p-1/2)} $ both solve $x^2=1$, we have $g^{(p-1/2)}=-1$, so $g^{(p-1/4)}$ solves $x^2=-1$.
+    \item[] 
+\end{itemize}
+\end{myproof}
+
+\begin{lemma}
+    $\abs{\Gamma_p} = \frac{p-1}{2}$
+\end{lemma}
+\begin{myproof}
+    Consider the group homomorphism $\phi\,:\,\Z^\times_p\rightarrow\Z^\times_p$ by $\phi(x)=x^2$ which we use to construct $\Gamma$ (homomorphism trivial). By previous Lemma,$Ker(\phi)$ contains $1,-1$ only, so by first homomorphism theorem ($G/Ker(\phi) \cong Im(\phi)$), $\abs{Im(\phi)}=\abs{G/Ker(\phi)}=(p-1)/2$. \newline
+\end{myproof}
+
+\begin{proposition}
+    Let $p$ be a prime with $p\equiv 1\Mod{4}$
+    \begin{itemize}
+        \item $\Gamma_p$ is a symmetric subset of $\Z_p$
+        \item The graph $\Cay{\Z_p,\Gamma_p}$ is connected and $\frac{p-1}{2}$-regular.
+    \end{itemize}
+\end{proposition}
+\begin{remark}
+    Graph $\Cay{\Z_p,\Gamma_p}$ is called a Payley graph, a.k.a. $Paley(p)$. There are infinitely many primes of the form $4k+1$ by Dirichlet's theorem, so Payley graphs indeed form an infinite family.
+\end{remark}
+\begin{myproof}
+    \begin{itemize}
+        \item[]
+        \item By last lemma, there exists $x^2=-1\in\Gamma_p$, so the if $\gamma=y^2\in\Gamma_p$, then $-\gamma=(xy)^2\in\Gamma_p$
+        \item Connected since $1\in\Gamma_p$
+        \item[] 
+    \end{itemize}
+\end{myproof}
+
+\begin{definition}
+    Let $\xi=e^{2\pi i/p} $, then 
+    $$
+    G_p(a) = \sum^{p-1}_{k=0}\xi^{ak^2}
+    $$
+    is called a Gauss sum.
+\end{definition}
+\begin{remark}
+    By results of section 3, the eigenvalues of the Cayley graph $\Cay{\Z_p,\Gamma_p}$ are given by 
+    $$
+    \lambda_a = \sum_{k\in\Gamma_p}\xi^{ak} = \frac{1}{2}\sum^{p-1}_{k=1}\xi^{ak^2}=\frac{1}{2}G_p(a) - \frac{1}{2}
+    $$
+    where $a=0,1,\dots,p-1$ and $\xi = e^{2\pi i/p} $. So we focus on bounding $G_p(a)$ from above. \newline
+\end{remark}
+
+\begin{definition}
+    Let $a\in\Z$ and $p$ be an odd prime. The Legendre symbol is defined as 
+    $$
+    \left( \frac{a}{p} \right) = 
+    \left\{
+    \begin{array}{ll}
+        0 & \textrm{if p divides a}  \\
+        1 & \textrm{if $x^2\equiv a\Mod{p}$ has a solution} \\ 
+        -1 & \textrm{if $x^2\equiv a\Mod{p}$ has no solution}
+    \end{array}
+    \right.
+    $$\newline
+\end{definition}
+
+\begin{lemma}
+    Let $a,b\in\Z$ and $p$ an odd prime
+    \begin{itemize}
+        \item $\left(\frac{a^2}{p}\right)=1$
+        \item If $a\equiv b\Mod{p}$, then $\left(\frac{a}{p}\right)=\left(\frac{b}{p}\right)$
+        \item $\left(\frac{a}{p}\right)\left(\frac{b}{p}\right)=\left(\frac{ab}{p}\right)$
+        \item[] 
+    \end{itemize}
+\end{lemma}
+
+\begin{proposition}
+    If $a\not\equiv \Mod{p}$, then 
+    $$
+    G_p(a) = \sum^{p-1}_{k=1}\left(\frac{k}{p}\right)\xi^{ak}
+    $$
+    where $\xi = e^{2\pi i/p} $
+\end{proposition}
+\begin{myproof}
+    Let $T_p=\Z^\times_p\backslash\Gamma_p$, which is the set of nonsquares, so $\left(\frac{k}{p}\right)=1$ for all $k\in\Gamma_p$, $\left(\frac{k}{p}\right)=-1$ for all $k\in T_p$
+    $$
+    \sum^{p-1}_{k=1}\left(\frac{k}{p}\right)\xi^{ak} = \sum_{k\in\Gamma_p}\xi^{ak}-\sum_{k\in T_p}\xi^{ak} = 2\sum_{k\in\Gamma_p}\xi^{ak} + 1 - \sum^{p-1}_{k=0}\xi^{ak}
+    $$
+    where 1 comes from taking $k=0$. Take the sum of last term, it goes to 0, thus 
+    $$
+    \sum^{p-1}_{k=1}\left(\frac{k}{p}\right)\xi^{ak} = 2\sum_{k\in\Gamma_p}\xi^{ak} + 1 = \sum^{p-1}_{k=1}\xi^{ak^2} = G_p(a)
+    $$\newline
+\end{myproof}
+
+\begin{proposition}
+    If $a\not\equiv \Mod{p}$, then 
+    \begin{itemize}
+        \item $G_p(a)=\left(\frac{a}{p}\right)G_p(1)$
+        \item $\abs{G_p(a)}=\sqrt{p}$
+    \end{itemize}
+\end{proposition}
+\begin{myproof}
+    \begin{itemize}
+        \item[]
+        \item Since $\Z^\times_p$ is a multiplicative group, for all $a\in\Z^\times_p$, the map $a\rightarrow ak$ is a bijection (surjective: for $t$, take $tk^{-1}$; injective: from mod). Hence
+        $$
+        \left(\frac{a}{p}\right)G_p(a) = \left(\frac{a}{p}\right)\sum^{p-1}_{k=1}\left(\frac{k}{p}\right)\xi^{ak} = \sum^{p-1}_{k=1}\left(\frac{ak}{p}\right)\xi^{ak} = \sum^{p-1}_{t=1}\left(\frac{t}{p}\right)\xi^{t} = 1
+        $$
+        second equality by Legendre symbol property, third equality by bijection
+        \item We compute $G_p(1)^2$
+        \begin{align*}
+            G_p(1)^2 &= \left(\sum^{p-1}_{m=1}\left(\frac{m}{p}\right)\xi^{m}\right)\left(\sum^{p-1}_{n=1}\left(\frac{n}{p}\right)\xi^{n}\right) \\
+            &= \sum^{p-1}_{m=1}\sum^{p-1}_{n=1}\left(\frac{m}{p}\right)\xi^{m}\left(\frac{mn}{p}\right)\xi^{mn} \\
+            &\textrm{use the bijection $n\rightarrow mn$} \\
+            &= \sum^{p-1}_{m=1}\sum^{p-1}_{n=1}\left(\frac{m^2n}{p}\right)\xi^{m+mn} \\
+            &= \sum^{p-1}_{m=1}\sum^{p-1}_{n=1}\left(\frac{n}{p}\right)\xi^{m+mn} \\
+            &\textrm{break $m^2n$, squared Legendre symbol gives 1}
+        \end{align*}
+        Take the sum, we have 
+        $$
+        \sum^{p-1}_{m=1}(\xi^{1+n})^m = \left\{
+        \begin{array}{ll}
+            p-1 & n = p-1 \\
+            -1 & n = 1,2,\dots,p-2
+        \end{array}
+        \right.
+        $$
+        Let $T_p$ be the set of non-squares, we have $\abs{\Gamma_p}=\abs{T_p}=\frac{p-1}{2}$. Therefore
+        \begin{align*}
+            G_p(1)^2 
+            &= -\sum^{p-2}_{n=1}\left(\frac{n}{p}\right) + (p-1)\left(\frac{p-1}{p}\right) \\
+            &= -\sum^{p-1}_{n=1}\left(\frac{n}{p}\right) + (p)\left(\frac{p-1}{p}\right) \\
+            &= -\left(\sum_{n\in\Gamma_p}1+\sum_{n\in T_p}(-1)\right) + p\left(\frac{p-1}{p}\right) \\
+            &= p\left(\frac{p-1}{p}\right) = \left(\frac{-1}{p}\right)p \\
+            &\textrm{under mod $p$, $-1=p-1$} \\
+            &= p \\
+            &\textrm{we know $x^2=-1$ has a solution}
+        \end{align*}
+        Hence, $\abs{G_p(a)}=\sqrt{p}$. \newline
+    \end{itemize}
+\end{myproof}
+
+\begin{proposition}
+    If $p\equiv 1\Mod{4}$, then $\Cay{\Z_p,\Gamma_p}$ is a Ramanujan graph.
+\end{proposition}
+\begin{myproof}
+Recall the graph is of degree $\frac{p-1}{2}$
+    $$
+    \abs{\lambda_a}=\abs{\frac{G_p(a)-1}{2}}\le \frac{1}{2}(\sqrt{p}+1)\le 2\sqrt{\frac{p-1}{2}-1}
+    $$
+\end{myproof}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\end{document}
