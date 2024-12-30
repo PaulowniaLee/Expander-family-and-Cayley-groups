@@ -1,0 +1,892 @@
+\documentclass{book}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{graphicx} % Required for inserting images
+\usepackage{amsmath} % basic math stuff, also aligned environment 
+\usepackage{amsfonts} % defeines blackboard bold fonts for \Z, \R
+\usepackage{tikz} % Drawing environment 
+\usepackage{amsthm} % AMS theorem defining stuff
+\usepackage{amssymb} % good looking empty set
+\usepackage{leftindex} % left superscript
+\usepackage{float} % picture position
+\usepackage{scalerel} % parallel for subscript
+
+% Formating stuff
+\usepackage{hyphenat} % forbid use of hyphen
+%complete elimination of hyphen 
+\righthyphenmin = 100
+\lefthyphenmin = 100
+%取消段前空格
+\setlength{\parindent}{0pt}
+
+% Makes section headings and cross references act like links
+\usepackage[colorlinks,unicode]{hyperref}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Create simple shortcut commands.  Almost everyone who uses LaTeX
+% creates commands like thes.
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\C}{\mathbb{C}}
+
+% this is to highlight words that are being defined and enter.
+\newcommand{\define}[1]{\textbf{#1}}
+
+% Symmetric inclusion symbol 
+\newcommand{\syin}{$\subset$\kern-0.48em\raisebox{.20ex}{\tiny S}$\,$}
+%\kern 左右移动(-为向左)，\raisebox 上下移动(-为向下)
+% Note this symbol does not work in math mode.
+
+% Zig-Zag product symbol 
+\newcommand{\zigzag}{$\bigcirc$\kern-0.77em\raisebox{-.16ex}{\small Z}$\,$}
+%\kern 左右移动(-为向左)，\raisebox 上下移动(-为向下)
+% Note this symbol does not work in math mode.
+
+% diam
+\newcommand{\diam}[1]{\textrm{diam}( #1 )}
+% inner product 
+\newcommand{\inner}[1]{\langle #1 \rangle}
+% norm 
+\newcommand{\norm}[1]{\lVert #1 \rVert}
+% dist
+\newcommand{\dist}[1]{\textrm{dist}( #1 )}
+% absolute value 
+\newcommand{\abs}[1]{\lvert #1 \rvert }
+% Cayley graph 
+\newcommand{\Cay}[1]{\textrm{Cay}( #1 )}
+% Cos graph
+\newcommand{\Cos}[1]{\textrm{Cos}( #1 )}
+% Automorphism group 
+\newcommand{\Aut}[1]{\textrm{Aut}( #1 )}
+% multiplicity of edges
+\newcommand{\mul}[1]{\textrm{mul}( #1 )}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% The next page or two of stuff is devoted to creating and
+% manipulating the environments for lemma, proof, example, etc.
+% The first part is pretty simple, and almost everyone has commands
+% like this in every paper, article, book, etc.  
+% 
+% We start with things like lemmas, theorems, etc.
+
+%注释
+%\newtheorem{env name}{text}[parent counter]
+%\newtheorem{env name}[shared counter]{text}
+%parent counter: numbering will resteart whenever that sectional level is encountered
+%shared counter: if specificed, numbering will progress sequentially for 
+%all theorem element using this counter
+
+\theoremstyle{definition} 
+%adds extra space above and below, but sets the text in roman
+%recommended for definitions, conditions, problems, and examples
+
+\newtheorem{lemma}{Lemma}[chapter]
+\newtheorem{proposition}[lemma]{Proposition}
+\newtheorem{theorem}[lemma]{Theorem}
+\newtheorem{corollary}[lemma]{Corollary}
+\newtheorem{definition}[lemma]{Definition}
+
+%自定义新的theorem environment
+\newtheoremstyle{remarkstyle}
+    {\topsep}%   space above, empty for `usual value'
+    {\topsep}%   space below
+    {}%          body font, input \itshape for italian
+    {}%          indent amount 
+    {}%          thm head font 
+    {}%          Punctuation after thm head
+    {\newline}%  Space after thm head: \newline = linebreak
+    {}%          Thm head spec
+\theoremstyle{remarkstyle}
+\newtheorem*{remark}{Remark}%[chapter] 
+\newtheorem*{example}{Example}%[chapter]
+\newtheorem*{myproof}{Proof}%[chapter]
+%this formating (* and %[chapter]) elminates numbering for theorem environment
+
+%theorem之间的空间是手动调的，在最后加个\newline或者item[]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% The stuff that follows is a bit tricky, and is well more than most
+% people do with LaTeX.  The basic idea is that I want to be able to
+% show only examples, or only definitions, or hide only proofs, etc.  
+
+
+\makeatletter
+% the following key values give the set up for hiding certain
+% environemnts. Note that "true" is just a dummy value.  It would work
+% equally well with "foo".  Each one of these redefines the outer
+% environment for an atom to turn the whole thing into a hidden
+% comment.  Note that the environments theorem, example, etc. do not
+% have to be written in any special way for hide and show to work.
+% They get clobbered by hide.  
+  \define@key{hide}{lemma}[true]{\renewenvironment{lemma}{\comment}{\endcomment}}
+  \define@key{hide}{comments}[true]{\renewenvironment{comments}{\comment}{\endcomment}}
+  \define@key{hide}{corollary}[true]{\renewenvironment{corollary}{\comment}{\endcomment}}
+  \define@key{hide}{definition}[true]{\renewenvironment{definition}{\comment}{\endcomment}}
+  \define@key{hide}{example}[true]{\renewenvironment{example}{\comment}{\endcomment}}
+  \define@key{hide}{proposition}[true]{\renewenvironment{proposition}{\comment}{\endcomment}}
+  \define@key{hide}{theorem}[true]{\renewenvironment{theorem}{\comment}{\endcomment}}
+  \define@key{hide}{remark}[true]{\renewenvironment{remark}{\comment}{\endcomment}}
+  \define@key{hide}{myproof}[true]{\renewenvironment{myproof}{\comment}{\endcomment}}
+% Now this command can be given a comma separated list of names to
+% hide.  Thus, \HideEnvirons{ example, proof} would hide all examples
+% and proofs.
+\newcommand{\HideEnvirons}[1]{\setkeys{hide}{#1}}
+
+
+% The \ShowEnvirons command works like this: if it's argument is foo,
+% it redefines the *hide* family key for foo to do nothing.  Then, it
+% issues a \HideEnvirons command containing a list of all the atom
+% types.  So, everything is hidden *unless* the hide-family key has
+% been redefinied.
+  \define@key{show}{lemma}[true]{\define@key{hide}{lemma}{}}
+  \define@key{show}{comments}[true]{\define@key{hide}{comments}{}}
+  \define@key{show}{corollary}[true]{\define@key{hide}{corollary}{}}
+  \define@key{show}{definition}[true]{\define@key{hide}{definition}{}}
+  \define@key{show}{example}[true]{\define@key{hide}{example}{}}
+  \define@key{show}{proposition}[true]{\define@key{hide}{proposition}{}} 
+  \define@key{show}{theorem}[true]{\define@key{hide}{theorem}{}}
+  \define@key{show}{remark}[true]{\define@key{hide}{remark}{}}
+  \define@key{show}{myproof}[true]{\define@key{hide}{myproof}{}}
+% This command can be given a comma separated list of names to show,
+% and only these will be shown.  Thus,
+% \ShowEnvirons{example,definition} will show only examples and definitions.
+\newcommand{\ShowEnvirons}[1]
+{\setkeys{show}{#1}\HideEnvirons{%
+    comments,
+    corollary,
+    definition,
+    example,
+    proposition,
+    theorem,
+    lemma,
+    remark,
+    myproof
+  }}
+\makeatother
+
+% Comment out the next line to see the full text
+\ShowEnvirons{definition, proposition, theorem, remark, example, lemma, myproof, corollary}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+\setcounter{chapter}{4}
+\chapter{Zig-Zag Product}
+% Tips facing very long chapter titles 
+% \chapter[medium-length title for Table of contents, if wanted]{full title name}
+% \chaptermark{short title for running headers}
+
+
+
+\section{Definition of the Zig-Zag Product}
+\begin{definition}
+    Graph $X$, $e$ an edge in $X$, $v$ a vertex incident to $e$. Define $e()$ as:
+    \begin{itemize}
+        \item $e(v)=v$ if $e$ is a loop;
+        \item $e(v)=w$, where $w$ is the other vertex, if $e$ is not a loop
+    \end{itemize}
+    That is, $e()$ takes the vertex adjacent to $v$ through edge $e$. \newline
+\end{definition}
+
+\begin{definition}
+Zig-Zag product (graph)
+\begin{itemize}
+    \item Let $Y$ be $d_Y$-regular, $X$ be $\abs{Y}$-regular
+    \item Vertex sets $V_X, V_Y$; edge multisets $E_X, E_Y$, multiple edges treated as distinct elements
+    \item For each vertex $v\in V_X $, let $E_v = \{e\in E_X \, \lvert \, v \textrm{ is an endpoint of } e \} $, let $L_v \, : \, V_{Y}\rightarrow E_v $ be a bijection (which always exists since $X$ is $\abs{Y}$-regular, making $\abs{V_Y}=\abs{E_v}$)
+    \item Call $L_v$ the labeling at $v$. Let $L$ be the set $\{L_v\,\lvert\, v\in V_Y\}$, call $L$ the labeling from $Y$ to $X$.
+    \item Define the zig-zag product $X$\zigzag$Y$ with labeling $L$ as follows
+    \begin{itemize}
+        \item Vertex set: $X\times Y$
+        \item Multiplicity (number) of edges between $(x_1,y_1)$ and $(x_2,y_2)$: number of ordered pairs $(z_1,z_2)\in E_Y\times E_Y$ s.t. 
+        \begin{itemize}
+            \item[1.] $y_1$ is an endpoint of $z_1$, $y_2$ is an endpoint of $z_2$
+            \item[2.] $L_{x_1}(z_1(y_1)) = L_{x_2}(z_2(y_2)) $ 
+            \item[] 
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+\end{definition}
+
+\begin{lemma}
+    A comprehensible way of finding edges in zig-zag product (graph): \newline
+    Let $(x_1,y_1)$ be a vertex in $X$\zigzag $Y$, now we find one of its adjacent vertex and the corresponding edge. Note that an adjacent vertex of $(x_1,y_1)$ can correspond to multiple edges, which are treated as distinct elements. \newline
+    \begin{itemize}
+        \item[Step 0] $(x_1,y_1)$
+        \item[Step 1 (Zig)] 
+        \begin{itemize}
+            \item Choose edge $z_1$ in $Y$ that is incident to $y_1$
+            \item Get $(x_1,z_1(y_1))$
+        \end{itemize}
+        \item[Step 2 (-)]
+        \begin{itemize}
+            \item Let $e=L_{x_1}(z_1(y_1))$, note $L_{x_1}\,:\, V_Y \rightarrow E_{x_1} $. Note $x_1$ must be an endpoint of $e$
+            \item Let $x_2$ be the other endpoint of edge $e$ 
+            \item Let $y' = L^{-1}_{x_2}(e) $
+            \item Get $(x_2, y') $
+        \end{itemize}
+        \item[Step 3 (Zag)]
+        \begin{itemize}
+            \item Choose $z_2$ in $Y$ that is incident to $y'$
+            \item Let $y_2=z_2(y')$
+            \item Get $(x_2,y_2)$
+        \end{itemize}        
+    \end{itemize}
+\end{lemma}
+\begin{remark}
+    Accounting practice:
+    \begin{itemize}
+        \item $d_Y$ choices of $z_1$ (edges incident to $y_1$)
+        \item $z_1(y_1)$ is unique (only two vertices for an edge)
+        \item $e=L_{x_1}(z_1(y_1))$ is unique (bijection)
+        \item $x_2$ is the endpoint of $e$ other than $x_1$, unique
+        \item $y' = L^{-1}_{x_2}(e) $ is unique (bijection)
+        \item $d_Y$ choices of $z_2$ (edges incident to $y'$)
+        \item $y_2=z_2(y')$ is unique (only two vertices for an edge)
+    \end{itemize}
+    Hence, the zig-zag product is $d_{Y}^{2}$-regular \newline
+\end{remark}
+
+\begin{definition}
+    Let $v$ be a vertex in $X$, define the $v$-cloud in $X$\zigzag $Y$ to be $\{ (v,y)\,\lvert\,y\in V_Y\} $
+\end{definition}
+\begin{remark}
+    It can be thought that we get $X$\zigzag $Y$ by replacing each vertex $v$ of $X$ with the $v$-cloud. \newline
+\end{remark}
+
+\begin{example}
+    In the following example, we denote the labeling $L$ from $Y$ to $X$ by labeling edges in $X$ with vertices of $Y$. Therefore, in $X$, each vertex has its incident edges labeled.
+    \begin{figure}[H]
+        \includegraphics[width=1\linewidth]{Screenshot 2024-10-18 at 11.53.09.png}
+    \end{figure}
+    \begin{figure}[H]
+        \includegraphics[width=1\linewidth]{Screenshot 2024-10-18 at 11.52.20.png}
+    \end{figure}
+\end{example}
+\begin{remark}
+    Zig-Zag products depend on the choice of labeling: different labeling could generate different graphs.
+\end{remark}
+
+\section{Adjacency Matrices and Zig-Zag Product}
+In this section, we express the adjacency operator of $X$\zigzag $Y$ in terms of the adjacency operators of $X$ and $Y$. \newline
+
+\begin{definition} Zig\&Zag graph ($Z$) and Hyphen graph ($H$) 
+    \begin{itemize}
+        \item Graph $Z$
+        \item Vertex Set: $V_X\times V_Y$
+        \item Multiplicity between $(x_1,y_1)$ and $(x_2,y_2)$:
+        \begin{itemize}
+            \item multiplicity of edge between $y_1$ and $y_2$, if $x_1=x_2$;
+            \item 0, if $x_1 \neq x_2 $
+        \end{itemize}
+        \item[] 
+        \item Graph $H$
+        \item Vertex Set: $V_X\times V_Y$
+        \item Multiplicity between $(x_1,y_1)$ and $(x_2,y_2)$:
+        \begin{itemize}
+            \item 1, if $L_{x_1}(y_1)=L_{x_2}(y_2)$;
+            \item 0, otherwise 
+        \end{itemize}
+    \end{itemize}
+\end{definition}
+\begin{remark}
+    \begin{itemize}
+        \item[] 
+        \item $Z$ is $d_Y$-regular: fix $(x_1,y_1) $, total multiplicity of incident edges is $d_Y$
+        \item $H$ is 1-regular (see Prop 5.6)
+        \item[] 
+    \end{itemize}
+\end{remark}
+
+
+\begin{proposition}
+    $X$\zigzag $Y$ = $Z \cdot H \cdot Z$
+\end{proposition}
+\begin{myproof}
+    \begin{itemize}
+        \item[]
+        \item Same vertex set, suffice to track edges. Start with $(x_1,y_1)$, track its incident edge $e_0$. On the RHS, we go through $e_1 \in Z, e_2 \in H, e_3\in Z$, and $\mul{e_0}=\mul{e_1}\mul{e_2}\mul{e_3}$.
+        \item Zig-Step ($Z$): Choose $z_1$, $e_1$ is between $(x_1,y_1)$ and $(x_1,z_1(y_1))$, and $\mul{e_1}=d_Y$ in total.
+        \item Hyphen-Step ($H$): No choice, everything fixed. $e_2$ is between $(x_1,z_1(y_1))$ and $(x_2,y')$. Since $L_{x_1}(z_1(y_1)) = e$, $L_{x_2}(y') = L_{x_2}(L^{-1}_{x_2}(e)) = e$, $\mul{e_2}=1$ in total.
+        \item Zag-Step ($Z$): Choose $z_2$, $e_2$ is between $(x_2,y'))$ and $(x_2,z_2(y') )$, and $\mul{e_3}=d_Y$ in total.
+        \item By go through $e_1 \in Z, e_2 \in H, e_3\in Z$ we indeed get $e_0$ in $X$\zigzag $Y$ as an edge incident to $(x_1,y_1)$. Also, degree of $(x_1,y_1)$ calculated with this approach is same as $d^{2}_Y $ in $X$\zigzag $Y$, done.
+        \item[] 
+    \end{itemize}
+\end{myproof}
+
+\begin{example}
+    This example shows how $Z$ and $H$ look like.
+    \begin{figure}[H]
+        \includegraphics[width=1\linewidth]{Screenshot 2024-10-18 at 13.05.05.png}
+    \end{figure}
+    \begin{figure}[p]
+        \includegraphics[width=1\linewidth]{Screenshot 2024-10-18 at 17.24.08.jpg}
+    \end{figure}
+\end{example}
+
+\begin{definition}
+\begin{itemize}
+    \item[] 
+    \item Fix an ordering $x_1, \dots, x_n $ of the vertices of $X$ and an ordering $y_1, \dots, y_{d_X} $ of the vertices of $Y$. Order the vertices of $X$\zigzag $Y$ lexicographically, i.e. $x_1y_1, \dots, x_1y_{d_X}, x_2y_1, \dots, x_2y_{d_X}, \dots, x_{n}y_1, \dots, x_ny_{d_X} $ 
+    \item Let $\tilde{B}, \tilde{A}, \tilde{M} $ be the adjacency matrices of $Z$, $H$, and $X$\zigzag $Y$, in terms of this ordering.
+    \item Let $A, B$ be the adjacency matrices of $X,Y$, in terms of this ordering.
+    \item[] 
+    \item[]
+\end{itemize}
+\end{definition}
+
+\begin{corollary}
+    $\tilde{M}=\tilde{B}\tilde{A}\tilde{B}$
+\end{corollary}
+\begin{myproof}
+    Since all matrices have same ordering of the same vertex set, Prop 1.32 \newline 
+\end{myproof}
+
+\begin{proposition}
+    $\tilde{B}$ equals the $\abs{X}\cdot\abs{Y}\times\abs{X}\cdot\abs{Y}$ block diagonal matrix
+    $$
+    \left(\begin{array}{cccc}
+        B & 0 & \dots & 0 \\
+        0 & B & \dots & 0 \\
+        \vdots & \vdots & \ddots  & \vdots \\
+        0 & 0 & \dots & B
+    \end{array}\right)
+    $$
+\end{proposition}
+\begin{myproof}
+    Each block is a $\abs{X}\times\abs{X}$ matrix, and there are $d_X \times d_X$ such blocks. Adjacent iff $x_1=x_2$, thus only the diagonal blocks are non-zero. Since the multiplicity is the multiplicity in $Y$, diagonal blocks are just $B$. \newline
+\end{myproof}
+
+\begin{definition}
+    Define operator $C\,:\, L^{2}(X$\zigzag$Y)\rightarrow L^{2}(X) $ by 
+    $$
+    Cf(x) = \sum_{y\in V_Y}f(x,y)
+    $$
+    In other words, $C$ sums over clouds.
+\end{definition}
+\begin{remark}
+    Note $X$\zigzag$Y$, $Z$, and $H$ all have the same vertex set, thus $L^{2}(X$\zigzag$Y), L^{2}(Z), L^{2}(H)$ are identical. \newline
+\end{remark}
+
+\begin{definition}
+    $\tilde{\beta}\in L^{2}(X$\zigzag$Y)$ is constant on clouds if $\tilde{\beta}(x,y_1)=\tilde{\beta}(x,y_2)$ for all $x\in V_X,$ $y_1,y_2\in V_Y$. \newline
+\end{definition}
+
+\begin{proposition}
+    If $\tilde{\beta}\in L^{2}(X$\zigzag$Y)$ is constant on clouds, then $AC\tilde{\beta}=d_XC\tilde{A}\tilde{\beta}$
+\end{proposition}
+\begin{myproof}
+    \begin{itemize}
+        \item[]
+        \item Recall $Af(v) = \sum_{w\in V_X}A_{v,w}f(w) $
+        \item Let $v\in V_X$, $\tilde{e_v}$ be the vector in $L^{2}(X$\zigzag$Y)$ defined by $\tilde{e_v} = 1$ if $v=x$ and $\tilde{e_v} = 0$ if $v\neq x$. 
+        \item Since $\tilde{e_v}$ form a basis for the subspace of vectors of $L^{2}(X$\zigzag$Y)$ that are constant on clouds, suffice to show $AC\tilde{e_v}=d_XC\tilde{A}\tilde{e_v}$ for all $v\in V_X$
+        \item Note both sides are in $L^{2}(X)$. Let $w\in V_X$.
+        \item $C\tilde{e_v}()=\sum_{y\in V_Y}\tilde{e_v}(\;,y)=\abs{Y}\delta_v()=d_X\delta_v() $ (here $\delta()$ is a function that gives 1 if input is $v$ and 0 otherwise, second equality by definition of $\tilde{e_v}$)
+        \item $AC\tilde{e_v}(w)=d_XA\delta_v(w)=d_X\sum_{t\in V_x}A_{t,w}\delta_v(t)=d_X \cdot \textrm{ \#edges between $v$ and $w$} $
+        \item 
+        \begin{align*}
+            (C\tilde{A}\tilde{e_v})(w) 
+            &=\sum_{y\in V_Y}(\tilde{A}\tilde{e_v}(w,y) \\
+            &=\sum_{y\in V_Y}\sum_{(p,q)\in H}\tilde{A}_{(w,y)(p,q)}\tilde{e_v}(p,q) \\
+            &=\sum_{y\in V_Y}\sum_{q\in V_Y}\tilde{A}_{(w,y)(v,q)}\tilde{e_v}(v,q) \\
+            &\textrm{note adjacency in $H$ requires $L_v(q)=L_w(y)=$ some edge between $v$ and $w$ }\\
+            &\textrm{since $L_v,L_w$ are bijective, there is only one pair of $q, y$ and one edge, for fixed $v,w$.}\\
+            &\textrm{Hence, the adjacency is reduced to adjacency of $w,v$}\\
+            &\textrm{Also, summing over $Y$ ensures all adjacency is captured}\\
+            &= \textrm{\# edges between $w,v$}
+        \end{align*}
+        \item[] 
+    \end{itemize}
+\end{myproof}
+
+\section{Eigenvalues of Zig-Zag Product}
+This section gives an upper bound on the $\lambda(X$\zigzag$Y)$ in terms of $\lambda(X),\lambda(Y)$. \newline
+
+\begin{definition}
+    \begin{itemize}
+        \item[]
+        \item For any vertex $v\in V_X$, define $\tilde{f_v}\in L^{2}(X$\zigzag$Y)$ by 
+        $$
+        \tilde{f_v}(x,y)= \left\{ 
+        \begin{array}{ll}
+             \abs{Y}^{-1/2} & v=x  \\
+             0 & v\neq x 
+        \end{array}
+        \right.
+        $$
+        So $\tilde{f_v}$ is a unit vector that is constant on the $v$-cloud and 0 outside the $v$-cloud, and is orthogonal to each other 
+        \item For any $\tilde{\alpha}\in L^{2}_{0}(X$\zigzag$Y)$ and any $v\in V_X$, define 
+        \begin{itemize}
+            \item $\tilde{\alpha}_{v}^{\parallel} = \inner{\tilde{\alpha},\tilde{f}_{v}}\tilde{f}_v $ 
+            \item $\tilde{\alpha}^{\parallel}=\sum_{v\in V_X}\tilde{\alpha}^{\parallel}_{v} $ (constant on clouds part)
+            \item $\tilde{\alpha}^{\perp} = \tilde{\alpha} - \tilde{\alpha}^{\perp} $ (summing to 0 on clouds part)
+        \end{itemize}
+        \item 0 denotes the zero vector in $L^{2}_{0}(X$\zigzag$Y)$ 
+    \end{itemize}
+\end{definition}
+\begin{remark}
+    \begin{itemize}
+        \item[]
+        \item By definition, $\sum_{x,y \in X\times Y}\tilde{\alpha}(x,y)=0 $ (summing to 0)
+        \item $\tilde{\alpha}^{\parallel}(x,y)= \inner{\tilde{\alpha},\tilde{f}_{x}}\tilde{f}_x(x,y)=\inner{\tilde{\alpha},\tilde{f}_{x}}\abs{Y}^{-1/2}$, the part constant on clouds.
+        \item $\inner{\tilde{\alpha}, \tilde{f}_x } = \sum_{(p,q)\in X\times Y}\tilde{\alpha}(p,q)\overline{\tilde{f}(p,q)} = \sum_{q\in Y}\sum_{p\in X}\tilde{\alpha}(p,q)\tilde{f}_x(p,q) = \sum_{q\in Y}\tilde{\alpha}(x,q)\abs{Y}^{-1/2} $
+        \item With fixed $x$, 
+        \begin{align*}
+            \sum_{y\in Y}\tilde{\alpha}^{\perp}(x,y) 
+            &= \sum_{y\in Y}\tilde{\alpha}(x,y)-\tilde{\alpha}^{\parallel}(x,y) \\
+            &= \sum_{y\in Y}\tilde{\alpha}(x,y)-\inner{\tilde{\alpha},\tilde{f}_{x}}\abs{Y}^{-1/2} \\
+            &= \left(\sum_{y\in Y}\tilde{\alpha}(x,y)\right) - \abs{Y}^{1/2}\inner{\tilde{\alpha}, \tilde{f}_x } \\
+            &= \left(\sum_{y\in Y}\tilde{\alpha}(x,y)\right) - \sum_{q\in Y}\tilde{\alpha}(x,q) \\
+            &= 0
+        \end{align*}
+        the part sums to 0 on clouds
+        \item Also, $\inner{\tilde{\alpha}^{\parallel}, \tilde{\alpha}^{\perp} } =0$
+        \begin{align*}
+            \inner{\tilde{\alpha}^{\parallel}, \tilde{\alpha}^{\perp} } 
+            &= \inner{\tilde{\alpha}^{\parallel}, \tilde{\alpha}} - \inner{\tilde{\alpha}^{\parallel}, \tilde{\alpha}^{\parallel}} \\
+            &= \sum_{v\in X}\inner{\tilde{\alpha},\tilde{f}_v}\inner{\tilde{f}_v,\tilde{\alpha}} - \norm{\tilde{\alpha}^{\parallel} }^{2} \\
+            &= \sum_{v\in X}\norm{\tilde{\alpha}^{\parallel}_v}^2 - \norm{\tilde{\alpha}^{\parallel} }^{2} = 0
+        \end{align*}
+        \item[] 
+    \end{itemize}
+\end{remark}
+
+\begin{lemma}
+    Let $\tilde{\alpha}\in L^{2}(X$\zigzag$Y)$. Then $C\tilde{\alpha}^{\perp}=0 $
+\end{lemma}
+\begin{myproof}
+    Actually this is already shown in the previous remark using $\inner{\tilde{\alpha}, \tilde{f}_x }$. Here is another proof using $\inner{\tilde{\alpha}^{\perp} , \tilde{f}_x }$\newline
+    For any $v\in V_X$, first note 
+    \begin{align*}
+        \inner{\tilde{\alpha}^{\perp}, \tilde{f}_v } 
+        &= \sum_{x,y\in X\times Y}\tilde{\alpha}^{\perp}(x,y)\overline{\tilde{f_v}(x,y)} \\
+        &= \sum_{y\in Y}\tilde{\alpha}^{\perp}(v,y)\abs{Y}^{-1/2} \\
+        &= \abs{Y}^{-1/2}\sum_{y\in Y}\tilde{\alpha}^{\perp}(v,y)
+    \end{align*}
+    Then
+    \begin{align*}
+        (C\tilde{\alpha}^{\perp})(v) 
+        &= \sum_{y\in Y}\tilde{\alpha}^{\perp}(v,y) \\
+        &= \abs{Y}^{1/2}\inner{\tilde{\alpha}^{\perp}, \tilde{f}_v } 
+    \end{align*}
+    Also note
+    \begin{align*}
+        \inner{\tilde{\alpha}^{\perp}, \tilde{f}_v } 
+        &= \inner{\tilde{\alpha} - \sum_{x\in X}\inner{\tilde{\alpha},\tilde{f}_x}\tilde{f}_x, \tilde{f}_v } \\
+        &= \inner{\tilde{\alpha}, \tilde{f_v} } - \sum_{x\in X}\inner{\tilde{\alpha}, \tilde{f}_x }\inner{\tilde{f}_x,\tilde{f}_v} \\
+        &= \inner{\tilde{\alpha}, \tilde{f_v} } - \inner{\tilde{\alpha}, \tilde{f}_v } = 0 \\
+    \end{align*}
+    Since $\inner{\tilde{f}_x,\tilde{f}_v } = 0$ iff $x\neq v$ and $\norm{\tilde{f}_v}=1$
+    \newline
+\end{myproof}
+
+\begin{lemma}
+    If $\tilde{\beta}\in L^{2}(X$\zigzag$Y)$, then $\norm{\tilde{A}\tilde{\beta}}=\norm{\tilde{\beta}}$.
+\end{lemma}
+\begin{myproof}
+    $\tilde{A}\tilde{\beta}(x,y) = \sum_{p,q\in X\times Y}\tilde{A}_{(x,y)(p,q)}\tilde{\beta}(p,q) = \tilde{\beta}(p,q)$, since $H$ is 1-regular. Thus $\tilde{A}$ is essentially a permutation. Then, as $\norm{}$ in our case sums over all vertices, there is no difference. \newline
+\end{myproof}
+
+\begin{lemma}
+    For any $\tilde{\alpha}\in L^{2}_{0}(X$\zigzag$Y)$, we have 
+    $$
+    \abs{\inner{\tilde{M}\tilde{\alpha}, \tilde{\alpha}}} \le d^2_{Y}\abs{\inner{\tilde{A}\tilde{\alpha}^{\parallel}, \tilde{\alpha}^{\parallel} } } + 2d_Y\norm{\tilde{\alpha}^{\parallel} }\cdot \norm{\tilde{B}\tilde{\alpha}^{\perp}} + \norm{\tilde{B}\tilde{\alpha}^{\perp}}^{2}
+    $$
+\end{lemma}
+\begin{myproof}
+    First note, if $\tilde{\beta}$ is constant on clouds, then $\tilde{B}\tilde{\beta}=d_Y\tilde{\beta}$
+    \begin{align*}
+        \tilde{B}\tilde{\beta}(x,y) 
+        &= \sum_{p,q\in X\times Y}\tilde{B}_{(p,q)(x,y)}\tilde{\beta}(p,q) \\
+        &= \sum_{q\in Y}\tilde{B}_{(x,q)(x,y)}\tilde{\beta}(x,q) \\
+        &\textrm{since adjacency in $H$ requires $x=p$} \\
+        &= d_Y\tilde{\beta}(x,y)\\
+        \textrm{since $\tilde{\beta}$ is constant on clouds}
+    \end{align*}
+    Then 
+    \begin{align*}
+        \inner{\tilde{M}\tilde{\alpha}, \tilde{\alpha}} 
+        &= \inner{\tilde{B}\tilde{A}\tilde{B}\tilde{\alpha}, \tilde{\alpha}} \\
+        &\textrm{by Corollary 5.8}\\
+        &= \inner{\tilde{A}\tilde{B}\tilde{\alpha}, \tilde{B}\tilde{\alpha}} \\
+        &\textrm{since $\tilde{B}$ is real symmetric hence self-adjoint} \\
+        &= \inner{\tilde{A}\tilde{B}(\tilde{\alpha}^{\parallel}+\tilde{\alpha}^{\perp}) , \tilde{B}(\tilde{\alpha}^{\parallel}+\tilde{\alpha}^{\perp})} \\
+        &= \inner{\tilde{A}\tilde{B}\tilde{\alpha}^{\parallel}, \tilde{B}\tilde{\alpha}^{\parallel} } + \inner{\tilde{A}\tilde{B}\tilde{\alpha}^{\parallel}, \tilde{B}\tilde{\alpha}^{\perp} } + \inner{\tilde{A}\tilde{B}\tilde{\alpha}^{\perp},\tilde{B}\tilde{\alpha}^{\parallel}} + \inner{\tilde{A}\tilde{B}\tilde{\alpha}^{\perp},\tilde{B}\tilde{\alpha}^{\perp}} \\
+        &\textrm{by observation, and since $\tilde{\alpha}^{\parallel}$ constant on clouds} \\
+        &= d^2_Y\inner{\tilde{A}\tilde{\alpha}^{\parallel},\tilde{\alpha}^{\parallel}} + d_Y\inner{\tilde{A}\tilde{\alpha}^{\parallel}, \tilde{B}\tilde{\alpha}^{\perp} } + d_Y\inner{\tilde{A}\tilde{B}\tilde{\alpha}^{\perp},\tilde{\alpha}^{\parallel}} + \inner{\tilde{A}\tilde{B}\tilde{\alpha}^{\perp},\tilde{B}\tilde{\alpha}^{\perp}} 
+    \end{align*}
+    Then, by triangle inequality 
+    \begin{align*}
+        \abs{\inner{\tilde{M}\tilde{\alpha}, \tilde{\alpha}}}
+        &\le d^2_Y\abs{\inner{\tilde{A}\tilde{\alpha}^{\parallel},\tilde{\alpha}^{\parallel}}} + d_Y\norm{\tilde{A}\tilde{\alpha}^{\parallel}} \cdot \norm{\tilde{B}\tilde{\alpha}^{\perp}} + d_Y\norm{\tilde{A}\tilde{B}\tilde{\alpha}^{\perp}} \cdot \norm{\tilde{\alpha}^{\parallel}} + \norm{\tilde{A}\tilde{B}\tilde{\alpha}^{\perp}} \cdot \norm{\tilde{B}\tilde{\alpha}^{\perp}} \\
+        &\textrm{by Lemma 5.15, $\norm{\tilde{A}\tilde{\beta}}=\norm{\tilde{\beta}}$} \\
+        &= d^2_Y\abs{\inner{\tilde{A}\tilde{\alpha}^{\parallel},\tilde{\alpha}^{\parallel}}} + 2d_Y\norm{\tilde{\alpha}^{\parallel}} \cdot \norm{\tilde{B}\tilde{\alpha}^{\perp}} + \norm{\tilde{B}\tilde{\alpha}^{\perp}}^{2}
+    \end{align*}
+    \newline
+\end{myproof}
+
+\begin{lemma}
+    If $Y$ is nonbipartite, then for any $\tilde{\alpha}\in L^{2}_{0}(X$\zigzag$Y)$, we have 
+    $$
+    \norm{\tilde{B}\tilde{\alpha}^{\perp}} \le \lambda(Y)\norm{\tilde{\alpha}^{\perp}}
+    $$
+\end{lemma}
+\begin{myproof}
+    \begin{itemize}
+        \item[]
+        \item For any $v\in X$, define $\alpha^{\perp}_v\in L^2(Y) $ by $\alpha^{\perp}_v(y)=\tilde{\alpha}^{\perp}(v,y) $
+        \item Then, following convention in Def 1.10, we can write $\tilde{\alpha}^{\perp}=(\alpha^{\perp}_{v_1}\,\lvert\,\alpha^{\perp}_{v_2}\,\lvert\dots\,\lvert\alpha^{\perp}_{v_n})^{T}$, where $n=\abs{X}$. That is, 
+        $$
+        \tilde{\alpha}^{\perp}(x,y) = \alpha^{\perp}_{v_1}(y)\delta_{v_1}(x) + \alpha^{\perp}_{v_2}(y)\delta_{v_2}(x) + \dots + \alpha^{\perp}_{v_n}(y)\delta_{v_n}(x)
+        $$
+        \item Note $\sum_{y\in Y}\tilde{\alpha}^{\perp}_v(y) = \sum_{y\in Y}\tilde{\alpha}^{\perp}(v,y) = 0  $ since $\tilde{\alpha}^{\perp}$ sums up to 0 on clouds, then $\alpha^{\perp}_v\in L^2_0(Y) $
+        \item $\tilde{B}\tilde{\alpha}^{\perp}=(B\alpha^{\perp}_{v_1}\,\lvert\,B\alpha^{\perp}_{v_2}\,\lvert\,\dots\,\lvert B\alpha^{\perp}_{v_n})^{T} $, since 
+        \begin{align*}
+            \tilde{B}\tilde{\alpha}^{\perp}(x,y) 
+            &= \sum_{p,q\in X\times Y}\tilde{B}_{(x,y)(p,q)}\tilde{\alpha}^{\perp}(p,q) \\
+            &= \sum_{q\in Y}\tilde{B}_{(x,y)(x,q)}\tilde{\alpha}^{\perp}(x,q)\\
+            &= \sum_{q\in Y}B_{y,q}\tilde{\alpha}^{\perp}_{x}(q) \\
+            &\textrm{essentially the x-block of $\tilde{B}$, which is $B$} \\
+            &= B\tilde{\alpha}^{\perp}_{x}(y)
+        \end{align*}
+        That is, 
+        $$
+        \tilde{B}\tilde{\alpha}^{\perp}(x,y)=\tilde{B}\tilde{\alpha}^{\perp}_{v_1}(y)\delta_{v_1}(x) + \tilde{B}\tilde{\alpha}^{\perp}_{v_2}(y)\delta_{v_2}(x) + \dots + \tilde{B}\tilde{\alpha}^{\perp}_{v_n}(y)\delta_{v_n}(x)
+        $$
+        \item With similar arguments as Prop 1.26 and Prop 3.6, since $Y$ is nonbipartite and $\alpha^{\perp}_v\in L^2_0(Y) $, we can show that $\norm{B\alpha^{\perp}_{v_j} }\le \lambda(Y)\norm{\alpha^{\perp}_{v_j}} $
+        \item Hence
+        \begin{align*}
+            \norm{\tilde{B}\tilde{\alpha}^{\perp}}^{2} 
+            &= \norm{B\alpha^{\perp}_{v_1}}^{2} + \norm{B\alpha^{\perp}_{v_2}}^{2} + \dots + \norm{B\alpha^{\perp}_{v_n}}^{2} \\
+            &\le \lambda(Y)^{2}\left(\norm{\alpha^{\perp}_{v_1}}^{2} + \norm{\alpha^{\perp}_{v_2}}^{2} + \dots + \norm{\alpha^{\perp}_{v_n}}^{2} \right)\\
+            &= \lambda(Y)^{2}\norm{\tilde{\alpha}^{\perp}}^{2}
+        \end{align*}
+        since both $B\alpha^{\perp}_{v} $ and $\alpha^{\perp}_{v} $ are orthgonal "basis" \newline
+    \end{itemize}
+\end{myproof}
+
+\begin{lemma}
+    $\tilde{\beta}_1,\tilde{\beta}_2\in L^{2}(X$\zigzag$Y)$ s.t. $\tilde{\beta}_2$ is constant on clouds. Then $\inner{C\tilde{\beta}_1, C\tilde{\beta}_2}=d_X\inner{\tilde{\beta}_1,\tilde{\beta}_2}$
+\end{lemma}
+\begin{myproof}
+    \begin{align*}
+        \inner{C\tilde{\beta}_1, C\tilde{\beta}_2}
+        &= \sum_{x\in X} \left(\sum_{y\in Y}\tilde{\beta}_1(x,y)\right) \left(\overline{\sum_{y\in Y} \tilde{\beta}_2(x,y)}\right) \\
+        &= \abs{Y}\sum_{x\in X}\left(\sum_{y\in Y}\tilde{\beta}_1(x,y)\overline{\tilde{\beta}_2(x,y)}\right) \\
+        &= d_X\sum_{x,y\in X\times Y}\tilde{\beta}_1(x,y)\overline{\tilde{\beta}_2(x,y)} \\
+        &= d_X\inner{\tilde{\beta}_1,\tilde{\beta}_2}
+    \end{align*}
+    \newline
+\end{myproof}
+
+\begin{lemma}
+    If $X$ is nonbipartite, the for any $\tilde{\alpha}\in L^{2}_{0}(X$\zigzag$Y)$, we have 
+    $$
+    \abs{\inner{\tilde{A}\tilde{\alpha}^{\parallel},\tilde{\alpha}^{\parallel}}} \le \frac{\lambda(X)}{d_X}\inner{\tilde{\alpha}^{\parallel},\tilde{\alpha}^{\parallel}}
+    $$
+\end{lemma}
+\begin{myproof}
+    First note that $C\tilde{\alpha}=C\tilde{\alpha}^{\parallel}$, since $C\tilde{\alpha}^{\perp}=0 $. Then, 
+    \begin{align*}
+        \inner{\tilde{A}\tilde{\alpha}^{\parallel},\tilde{\alpha}^{\parallel}} 
+        &= \frac{\inner{C\tilde{A}\tilde{\alpha}^{\parallel},C\tilde{\alpha}^{\parallel}}}{d_X} \\ 
+        &\textrm{Lemma 5.18, $\tilde{\alpha}^{\parallel}$ constant on clouds} \\
+        &= \frac{\inner{AC\tilde{\alpha}^{\parallel},C\tilde{\alpha}^{\parallel}}}{d^2_X} \\ 
+        &\textrm{Prop 5.12, $\tilde{\alpha}^{\parallel}$ constant on clouds} \\
+        &= \frac{\inner{AC\tilde{\alpha},C\tilde{\alpha}}}{d^2_X} \\ 
+        &\textrm{Note, or essentially because $\tilde{\alpha}^{\parallel}$ constant on clouds}
+    \end{align*} 
+    Since $\tilde{\alpha}\in L^{2}_{0}(X$\zigzag$Y)$, $C\tilde{\alpha}\in L^2_0(X)$, then by Prop 3.6 (a version of Rayleigh-Ritz), 
+    $$
+    \abs{\inner{\tilde{A}\tilde{\alpha}^{\parallel},\tilde{\alpha}^{\parallel}}} = \frac{\inner{AC\tilde{\alpha},C\tilde{\alpha}}}{d^2_X} \le \frac{\lambda(X)\inner{C\tilde{\alpha},C\tilde{\alpha}}}{d^2_X} = \frac{\lambda(X)\inner{C\tilde{\alpha}^{\parallel},C\tilde{\alpha}^{\parallel} }}{d^2_X} = \frac{\lambda(X)\inner{\tilde{\alpha}^{\parallel},\tilde{\alpha}^{\parallel} }}{d_X}
+    $$
+    \newline
+\end{myproof}
+
+\begin{theorem}
+    Nonbipartite $\abs{Y}$-regular graph $X$, nonbipartite $d_Y$-regular graph $Y$, then for any choice of labeling from $X$ to $Y$, we have 
+    $$
+    \lambda(X\textrm{\zigzag}Y)\le \frac{d^2_Y\lambda(X)}{d_X}+d_Y\lambda(Y)+\lambda(Y)^2
+    $$
+\end{theorem}
+\begin{myproof}
+    Let $\tilde{\alpha} \in L^{2}_0(X\textrm{\zigzag}Y) $, then 
+    $$
+    \begin{array}{ccccccc}
+         \abs{\inner{\tilde{M}\tilde{\alpha}, \tilde{\alpha}}} 
+         &\le&  
+         d^2_{Y}\abs{\inner{\tilde{A}\tilde{\alpha}^{\parallel}, \tilde{\alpha}^{\parallel} } } 
+         & + & 
+         2d_Y\norm{\tilde{\alpha}^{\parallel} }\cdot \norm{\tilde{B}\tilde{\alpha}^{\perp}} 
+         &+& 
+         \norm{\tilde{B}\tilde{\alpha}^{\perp}}^{2}  \\[5pt]
+         &\le&
+         \frac{d^2_Y}{d_X}\lambda(X)\norm{\tilde{\alpha}^{\parallel}}^2
+         & + &
+         2d_Y\lambda(Y)\norm{\tilde{\alpha}^{\parallel}} \cdot \norm{\tilde{\alpha}^{\perp}} 
+         & + &
+         \lambda(Y)^2\norm{\tilde{\alpha}^{\perp}}^2 \\[5pt]
+         & &
+         \textrm{Lemma 5.19} 
+         & & 
+         \textrm{Lemma 5.17}
+         & & 
+         \textrm{Lemma 5.17}
+    \end{array}
+    $$
+    Let $p=\frac{\norm{\tilde{\alpha}^{\parallel}}}{\norm{\tilde{\alpha}}}$, $q=\frac{\norm{\tilde{\alpha}^{\perp}}}{\norm{\tilde{\alpha}}}$. Since $\inner{\tilde{\alpha}^{\parallel}, \tilde{\alpha}^{\perp}}=0$, we have $p^2+q^2=1$, thus $p\le1, q\le1$. Also, $0\le (p-q)^2=1-2pq$, so $2pq\le1$. Therefore, 
+    $$
+    \frac{\abs{\inner{\tilde{M}\tilde{\alpha}, \tilde{\alpha}}}}{\inner{\tilde{\alpha}, \tilde{\alpha}}} \le d^2_{Y}\lambda(X)p^2 + 2\lambda(Y)d_Ypq + \lambda(Y)^2q^2 \le \frac{d^2_Y\lambda(X)}{d_X}+d_Y\lambda(Y)+\lambda(Y)^2
+    $$
+    Since $\tilde{\alpha}$ is arbitrary, by Rayleigh-Ritz, we have
+    $$
+    \lambda(X\textrm{\zigzag}Y)\le \frac{d^2_Y\lambda(X)}{d_X}+d_Y\lambda(Y)+\lambda(Y)^2
+    $$
+    \newline
+\end{myproof}
+
+
+
+\section{An Actual Expander Family}
+\begin{definition}
+    Base Graph 
+    \begin{itemize}
+        \item Let $p$ be a prime number greater than 35, $G=\Z^{8}_p $
+        \item Define identity of $G$ as 0
+        \item Define $\gamma\,:\, \Z^2_p \rightarrow G $ by $\gamma(x,y) = (x,xy,xy^2,xy^3,xy^4,xy^5,xy^6,xy^7)  $ Let $\Gamma = \{\gamma(x,y)\,\lvert\, (x,y) \in \Z^2_p\} $
+        \item Note $\Gamma$\syin$G$. Let $W=\Cay{G,\Gamma}$
+        \item Let $\omega=e^{\frac{2\pi i}{p}} $
+    \end{itemize}
+\end{definition}
+\begin{remark}
+    For inverse of $\gamma(x,y)$, consider $\gamma(x^{-1},y^{-1}) $. Note in $\Z_p$, we have $y^{-1}x^{-1}=p-y+p-x=x^{-1}y^{-1}$ \newline
+\end{remark}
+
+\begin{definition}
+    Write an element $a\in G=\Z^8_p $ as $a=(a_0, a_1, \dots, a_7) $. For two elements $a,b\in G$, define $a\cdot b=a_0b_0+a_1b_1+\dots+a_7b_7$ \newline
+\end{definition}
+
+\begin{lemma}
+    $$
+    \sum_{x\in G}\omega^{c\cdot x} = \left\{ 
+    \begin{array}{ll}
+        p^8 & c = 0  \\
+        0 & c \neq 0 
+    \end{array}
+    \right.
+    $$
+\end{lemma}
+\begin{myproof}
+    Since $\abs{G}=p^8$, the result is immediate if $c=0$. If $c\neq 0$, then $c_j\neq 0$ for some $j$. WLOG, assume $c_0\neq 0$, then 
+    \begin{align*}
+        \sum_{x\in G}\omega^{c\cdot x} 
+        &= \sum_{x\in G}\omega^{c_0x_0}\omega^{c_1x_1}\dots\omega^{c_7x_7} \\
+        &= \sum_{x_0\in \Z_p}\sum_{x_1\in \Z_p}\dots\sum_{x_7\in \Z_p}\omega^{c_0x_0}\omega^{c_1x_1}\dots\omega^{c_7x_7} \\
+        &= \left( \sum_{x_0\in \Z_p}\omega^{c_0x_0} \right)\left(\sum_{x_1\in \Z_p}\dots\sum_{x_7\in \Z_p}\omega^{c_1x_1}\dots\omega^{c_7x_7}\right) = 0
+    \end{align*}
+    By Lemma 1.18, 
+    $$\sum_{j=0}^{p-1} (\omega^{c_0})^{j} = 0 $$ 
+    since $c_0\neq 0$ and $c_0\in \Z_p$, thus $p$ not dividing $c_0$. \newline
+\end{myproof}
+
+\begin{definition}
+\begin{itemize}
+    \item[]
+    \item For any $a\in G$, define $f_a\in L^2(W) $ by $f_a(x)=\omega^{a\cdot x} $
+    \item Let $A$ be the adjacency operator of $W$, define $\lambda_a=\sum_{x,y\in \Z_p}\omega^{a\cdot\gamma(x,y)} $
+    \item[] 
+\end{itemize}
+\end{definition}
+
+\begin{lemma}
+    For all $a\in G$, $Af_a=\lambda_af_a$
+\end{lemma}
+\begin{remark}
+    That is, eigenvalues of $W$ are precisely the numbers $\lambda_a$
+\end{remark}
+\begin{myproof}
+Recall formula for adjacency operator in Cayley graph:
+$$
+(Af)(g) = \sum_{\gamma\in\Gamma}f(g\gamma)
+$$
+    For any $b\in G$, we have 
+    \begin{align*}
+        (Af_a)(b) 
+        &= \sum_{\gamma(x,y)\in \Gamma} f_a(b+\gamma(x,y)) \\
+        &= \sum_{x,y\in\Z_p}\omega^{a\cdot b+a\cdot\gamma(x,y)} \\
+        &= \omega^{a\cdot b}\sum_{x,y\in\Z_p}\omega^{a\cdot\gamma(x,y)} \\
+        &= \lambda_af_a(b)
+    \end{align*}
+    \newline
+\end{myproof}
+
+\begin{lemma}
+    $\{f_a\,\lvert\,a\in G\} $ is an orthogonal set.
+\end{lemma}
+\begin{remark}
+    That is, every $f_a$ is an orthogonal eigenvector of $W$ with eigenvalue $\lambda_a$. Also, the number of $f_a$ is exactly $\abs{W}$, thus forming an orthogonal eigenbasis. 
+\end{remark}
+\begin{myproof}
+    For $a\neq b$
+    \begin{align*}
+        \inner{f_a,f_b} &= \sum_{x\in G}f_a(x)\overline{f_b(x)} \\
+        &= \sum_{x\in G}\omega^{a\cdot x}\omega^{-b\cdot x} \\
+        &= \sum_{x\in G}\omega^{(a-b)\cdot x} = 0
+    \end{align*}
+    Since $a-b\neq 0$ and Lemma 5.23 \newline
+\end{myproof}
+
+\begin{lemma}
+    For all $a\neq 0$, we have $0\le \lambda_a\le 7p$
+\end{lemma}
+\begin{myproof}
+    Fact: a nonzero polynomial of degree $d$ with coefficients in $\Z_p$ has no more than $d$ roots in $\Z_p$ 
+    \begin{align*}
+        \lambda_a &= \sum_{x,y\in \Z_p}\omega^{a\cdot \gamma(x,y)} \\
+        &= \sum_{x,y\in \Z_p}\omega^{a_0x + a_1xy + \dots + a_7xy^7} \\
+        &= \sum_{y\in \Z_p}\sum_{x\in \Z_p}\omega^{(a_0+a_1y+\dots+a_7y^7)x} 
+    \end{align*}
+    Define $g(t) = a_0 + a_1t + \dots + a_7t^{7} $ as a polynomial in $\Z_p$. For any fixed $y\in \Z_p$, by Lemma 1.18, we have 
+    $$
+    \sum_{x=0}^{p-1}(\omega^{g(y)})^x = \left\{
+    \begin{array}{ll}
+        p & g(y) = 0  \\
+        p & g(y) \neq 0 
+    \end{array}
+    \right.
+    $$
+    since $\abs{Z_p}=p$ and $p$ divides $g(y)$ iff $g(y)=0$ in $Z_p$ \newline 
+    Hence $\lambda_a=np \ge 0$, where $n$ is the number of roots of $g$ in $\Z_p$. Since $a\neq 0$ and $g(t)$ has 7 coefficients, by fact and by $n\le 7$, we have $\lambda_a\le 7p$. \newline
+\end{myproof}
+
+\begin{lemma}
+    Let $W = \Cay{G,\Gamma}$ in Def. 5.21, then 
+    \begin{itemize}
+        \item $\abs{W}=d^4_W$
+        \item $W$ is nonbipartite
+        \item $\lambda(W)<\frac{d_W}{5}=\frac{p^2}{5}$
+    \end{itemize}
+\end{lemma}
+\begin{remark}
+    A graph in the Expander family need not be nonbipartite, but we do need  nonbipartite here to control the eigenvalue of zig-zag product.
+\end{remark}
+\begin{myproof}
+    \begin{itemize}
+        \item[]
+        \item $\abs{W}=\abs{G}=p^8$, $d_W=\abs{\Gamma}=p^2$
+        \item By Lemma 5.27 and Lemma 5.25, all eigenvalues of $W$ is positive, so $-p^2$ is not an eigenvalue. By Prop. 1.16, not bipartite. 
+        \item By Lemma 5.27 and the fact that $p>35$
+        $$
+        \lambda(W) \le 7p \le \frac{p^2}{5}
+        $$
+        \item[] 
+    \end{itemize}
+\end{myproof}
+
+\begin{definition}
+    Let $W = \Cay{G,\Gamma}$ in Def. 5.21, recursively define a sequence $\{W_n\}$ as follows 
+    \begin{itemize}
+        \item $W_1=W^2$
+        \item $W_{n+1} = W^2_n$\zigzag$W$
+    \end{itemize}
+    where $W^2_n$\zigzag$W$ is formed using any choice of labeling from $W$ to $W^2_n$
+\end{definition}
+\begin{remark}
+    We have $d_{W_1} = d^2_W = (p^2)^2 = p^4 $, so $d_{W^2_1} = (p^4)^2 = p^8 = \abs{W} $, the zig-zag product is well-defined for first step. Also, $d_{W_2} = (d_W)^2 = p^4 $, so inductively $d_{W_n} = p^4 $ and all zig-zag products are well-defined. This legitimacy uses 8 in $G=\Z^8_p$. \newline
+\end{remark}
+
+\begin{theorem}
+    Let $\{W_n\}$ be as in Def. 5.29, then $\{W_n\}$ is an expander family.
+\end{theorem}
+\begin{myproof}
+    \begin{itemize}
+        \item[]
+        \item Since $\abs{W_{n+1} } = \abs{W^2_n\times W} = \abs{W_n}^2\abs{W} $ and $\abs{W}=p^8$, we have $\abs{W_n}\rightarrow\infty$
+        \item WTS: $\lambda(W_n) < 2p^4/5 $ for all $n$, then the spectral gap of $W_n$ is at least $3p^4/5$ for all $n$, so $\{W_n\}$ is an expander family.
+        \item Note $W^2_n$ is nonbipartite, since square of any undirected graph with at least one edge will contain a loop. If there is an edge between $a,b$ in $X$, then there will be a loop at $a$
+        \item By Prop. 1.33, Lemma 5.28
+        $$
+        \lambda(W^2)<\frac{p^4}{25}\le \frac{2p^4}{5}
+        $$
+        Base case done. For inductive step, assume $\lambda(W_n) < 2p^4/5 $. By Lemma 5.29, we know $W$ is nonbipartite. Then,
+        \begin{align*}
+            \lambda(W^2_n\textrm{\zigzag}W) 
+            &\le \frac{p^4\lambda(W^2_n)}{p^8} + p^2\lambda(W) + \lambda(W)^2 \\
+            &\textrm{by Theorem 5.20, and by nonbipartite $W^2_n, W$} \\
+            &\le \frac{4p^4}{25} + p^2\cdot \frac{p^2}{5} + \frac{p^4}{25} \\
+            &\textrm{by Lemma 5.29 and inductive hypothesis} \\
+            &= \frac{2p^4}{5}
+        \end{align*}
+    \end{itemize}
+\end{myproof}
+
+
+
+\clearpage
+\section{Zig-Zag Product and Semidirect Product}
+\begin{definition}
+Let $G,K$ be finite groups.
+    \begin{itemize}
+        \item Let $\theta\,:\, K\rightarrow \Aut{G}$ be a homomorphism
+        \item Let $\gamma\in G$ s.t. $\gamma^2 = e_G = 1$. That is, $\gamma$ is an element of order 2 in $G$, and following convention of semidirect product we take $e_G=e_K=1$, implicitly assuming $G,K$ are subgroups of a larger group.
+        \item Let $\Gamma=\{\theta_k(\gamma)\,\lvert\,k\in K\}$. Note each element of $\Gamma$ is its own inverse; hence, $\Gamma$\syin$G$.
+        \item Let $\Lambda$\syin$K$.
+        \item We have Cayley graphs $X=\Cay{G,\Gamma}$ and $Y=\Cay{K,\Lambda}$
+        \item For each $g\in G$ (also each vertex in $\Cay{G,\Gamma}$), let $E_g$ be as in Def. 5.2
+        \item Define $L_g\,:\,K\rightarrow E_g$ by taking $L_g(k)$ to be the edge between $g$ and $g\theta_k(g)$, let $L$ be the labeling defined by these $L_g$
+        \item[] 
+    \end{itemize}
+\end{definition}
+
+\begin{proposition}
+Following Def. 5.31, 
+    $$
+    \Cay{G,\Gamma}\textrm{\zigzag}_L\Cay{H,\Lambda} = \Cay{G \rtimes_\theta H, \Upsilon}, 
+    $$
+    where $\Upsilon$ is the multiset $\{\sigma_1\gamma\sigma_2\,\lvert\,(\sigma_1,\sigma_2)\in \Lambda\times\Lambda\}$
+\end{proposition}
+\begin{myproof}
+    Let $Z, H$ be as in Section 2. First claim: zig-zag graph Z equals $\Cay{G\rtimes K,\Lambda}$. Same vertex set is $G\times K$. Consider the multiplicity of the edge between $(g_1,k_1), (g_2,k_2)$. 
+    \begin{itemize}
+        \item In $Z$, we have $g_1=g_2$, and the multiplicity is the edge between $k_1,k_2$, which is the multiplicity of $\sigma$ in $\Lambda$ s.t. $k_1\sigma=k_2$, essentially the multiplicity of $k^{-1}_1k_2 $ in $\Lambda$
+        \item In $\Cay{G\rtimes K,\Lambda}$, we have $(g_1,k_1)(1,\sigma)=(g_2,k_2)$, thus $g_1=g_2$ and $\sigma=k^{-1}_1k_2 $. Multiplicity essentially lies on the multiplicity of $k^{-1}_1k_2 $ in $\Lambda$
+    \end{itemize}
+    Second claim: hyphen graph H equals $\Cay{G\rtimes K, \{\gamma\}}$. The Cayley graph is well-defined since $\gamma^2=1$ thus $\{\gamma\}$\syin$G\rtimes K$. Same vertex set is $G\times K$. Note both graphs are 1-regular. 
+    \begin{itemize}
+        \item $(g_1,k_1)(g_2,k_2)$ are adjacent in $H$
+        \item iff $L_{g_1}(k_1) = L_{g_2}(k_2) $
+        \item iff \{edge between $g_1$ and $g_1\theta_{k_1}(\gamma)$\} same as \{edge between $g_2$ and $g_2\theta_{k_2}(\gamma)$\} 
+        \item iff $g_1 = g_2\theta_{k_2}(\gamma) $ and $g_2 = g_1\theta_{k_1}(\gamma) $ (since if $g_1= g_2$, we have $k_1=k_2$ by bijectivity of $L_x$) 
+        \item iff $g_2 = g_1\theta_{k_1}(\gamma) $ and $\theta_{k_1}(\gamma)\theta_{k_2}(\gamma)=1$
+        \begin{itemize}
+            \item $\theta_{k_1}(\gamma) = \theta_{k_2}(\gamma) $
+        \end{itemize}
+        \item iff $g_2 = g_1\theta_{k_1}(\gamma) $ and $k_1=k_2$ (since each element of $\Gamma$ is its own inverse, last line suggests the two elements are essentially the same)
+        \item iff $(g_1,k_1)(\gamma,1)=(g_2,k_2)$ in $G\rtimes K$
+        \item iff $(g_1,k_1)$ and $(g_2,k_2)$ are adjacent in $\Cay{G\rtimes K, \{\gamma\}}$
+    \end{itemize}
+    Since $\Cay{G,\Gamma}\textrm{\zigzag}_L\Cay{H,\Lambda} = Z\cdot H\cdot Z$ (Prop. 5.6) and $\Cay{G \rtimes_\theta H, \Upsilon} = \Cay{G\rtimes K,\Lambda} \cdot \Cay{G\rtimes K, \{\gamma\}} \cdot  \Cay{G\rtimes K,\Lambda} $ (Prop. 1.35), done. \newline
+\end{myproof}
+
+\begin{example}
+    Let $Y$ be $d_Y$-regular with vertices $y_1, y_2, \dots, y_n$, $X$ be the graph with single vertex $K$ and $n$ loops. Then, $X$\zigzag$Y=Y^2$, with any labeling from $Y$ to $X$.
+\end{example}
+\begin{remark}
+    Can relate to Def 5.29, where $W_1$ defined as $W^2$ is essentially a zig-zag product.
+\end{remark}
+\begin{myproof}
+Can use $Y=K^2$ as an illustrating example for proof ideas.
+\begin{itemize}
+    \item 
+\end{itemize}
+\end{myproof}
+
+
+\end{document}
