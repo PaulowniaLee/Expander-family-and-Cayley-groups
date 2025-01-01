@@ -1,0 +1,6 @@
+For the final report of this directed study, I wrote a report documenting the probabilistic interpretation of the expander graphs (family). 
+That is, random walks on them behave very similarly to independent sampling. 
+One application of this property is to construct efficient sampler for simulation purposes (since pesudo-randomness is expansive). 
+I give a small example of error reduction for random algorithms to demonstrate how such sampler can be useful. 
+
+I will upload the report when I am allowed to do so. 
